@@ -12,7 +12,7 @@ const corsHeaders = {
 // Max file size: 50MB
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
 
-Deno.serve(async (req) => {
+Deno.serve(async (req: Request) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -95,7 +95,7 @@ Deno.serve(async (req) => {
     }
 
     // Parse webhook payload
-    let webhookData;
+    let webhookData: any;
     try {
       webhookData = JSON.parse(requestBody);
     } catch (error) {
@@ -150,7 +150,7 @@ Deno.serve(async (req) => {
             results.push({ 
               file: entry.path_display, 
               success: false, 
-              error: error.message 
+              error: (error as Error).message 
             });
           }
         }
