@@ -1,23 +1,12 @@
-import dynamic from 'next/dynamic'
-import { AppLayout } from '@/components/app-layout'
+'use client'
 
-// Dynamically import DreamsList to prevent SSR issues with Supabase
-const DynamicDreamsList = dynamic(
-  () => import('@/components/dreams-list'),
-  { 
-    ssr: false,
-    loading: () => (
-      <div className="p-6 text-center text-slate-500 dark:text-slate-400">
-        Loading dreams...
-      </div>
-    )
-  }
-)
+import { AppLayout } from '@/components/app-layout'
+import DreamsList from '@/components/dreams-list'
 
 export default function DreamsPage() {
   return (
     <AppLayout>
-      <DynamicDreamsList />
+      <DreamsList />
     </AppLayout>
   )
 }
