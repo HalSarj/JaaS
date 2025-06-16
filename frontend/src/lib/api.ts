@@ -86,6 +86,28 @@ export class ApiClient {
     return data
   }
 
+  async deleteDream(id: string): Promise<void> {
+    const client = getSupabaseClient()
+    const userId = getCurrentUserId()
+    
+    let query = client
+      .from('dreams')
+      .delete()
+      .eq('id', id)
+    
+    if (userId === null) {
+      query = query.is('user_id', null)
+    } else {
+      query = query.eq('user_id', userId)
+    }
+    
+    const { error } = await query
+
+    if (error) {
+      throw new Error(`Failed to delete dream: ${error.message}`)
+    }
+  }
+
   async searchDreams(query: string): Promise<Dream[]> {
     const client = getSupabaseClient()
     const userId = getCurrentUserId()
