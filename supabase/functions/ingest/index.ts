@@ -25,8 +25,8 @@ Deno.serve(async (req) => {
     const dropboxAppSecret = Deno.env.get('DROPBOX_APP_SECRET');
     const dropboxAccessToken = Deno.env.get('DROPBOX_ACCESS_TOKEN');
 
-    if (!supabaseUrl || !supabaseServiceKey || !dropboxAppSecret || !dropboxAccessToken) {
-      console.error('Missing required environment variables');
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.error('Missing required Supabase environment variables');
       return new Response('Server configuration error', {
         status: 500,
         headers: corsHeaders
@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
       const challenge = url.searchParams.get('challenge');
       
       if (challenge) {
-        console.log('Dropbox webhook verification challenge received');
+        console.log('Dropbox webhook verification challenge received:', challenge);
         return new Response(challenge, {
           status: 200,
           headers: { ...corsHeaders, 'Content-Type': 'text/plain' }
@@ -48,6 +48,15 @@ Deno.serve(async (req) => {
       
       return new Response('Webhook endpoint ready', {
         status: 200,
+        headers: corsHeaders
+      });
+    }
+
+    // For POST requests, we need Dropbox credentials
+    if (!dropboxAppSecret || !dropboxAccessToken) {
+      console.error('Missing Dropbox credentials - please set DROPBOX_APP_SECRET and DROPBOX_ACCESS_TOKEN');
+      return new Response('Dropbox credentials not configured', {
+        status: 500,
         headers: corsHeaders
       });
     }
