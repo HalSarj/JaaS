@@ -11,7 +11,7 @@ interface DreamsListProps {
   onDreamSelect?: (dream: Dream) => void
 }
 
-export function DreamsList({ onDreamSelect }: DreamsListProps) {
+function DreamsList({ onDreamSelect }: DreamsListProps) {
   const [dreams, setDreams] = useState<Dream[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [isLoading, setIsLoading] = useState(true)
@@ -178,3 +178,5 @@ export function DreamsList({ onDreamSelect }: DreamsListProps) {
     </div>
   )
 }
+
+export default DreamsList
