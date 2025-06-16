@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { MessageSquare, FileText, Menu, X } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { MessageSquare, FileText, Menu, X, Lock } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
@@ -15,9 +15,115 @@ interface AppLayoutProps {
   children: React.ReactNode
 }
 
+function PasswordPrompt({ onCorrectPassword }: { onCorrectPassword: () => void }) {
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError('')
+
+    const requiredPassword = process.env.NEXT_PUBLIC_APP_PASSWORD
+    
+    if (!requiredPassword) {
+      // If no password is set, allow access
+      onCorrectPassword()
+      return
+    }
+
+    if (password === requiredPassword) {
+      localStorage.setItem('dream-app-authenticated', 'true')
+      onCorrectPassword()
+    } else {
+      setError('Incorrect password')
+    }
+    
+    setLoading(false)
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
+      <div className="max-w-md w-full bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8">
+        <div className="text-center mb-8">
+          <Lock className="w-12 h-12 text-blue-600 mx-auto mb-4" />
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+            Dream Insight
+          </h1>
+          <p className="text-slate-600 dark:text-slate-400 mt-2">
+            Please enter the password to access your dream analysis
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter password"
+              className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-700 dark:text-slate-100"
+              disabled={loading}
+            />
+          </div>
+          
+          {error && (
+            <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading || !password}
+            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 dark:disabled:bg-slate-600 text-white py-3 rounded-lg font-medium transition-colors"
+          >
+            {loading ? 'Checking...' : 'Access App'}
+          </button>
+        </form>
+      </div>
+    </div>
+  )
+}
+
 export function AppLayout({ children }: AppLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const pathname = usePathname()
+
+  useEffect(() => {
+    // Check if password protection is enabled
+    const requiredPassword = process.env.NEXT_PUBLIC_APP_PASSWORD
+    
+    if (!requiredPassword) {
+      // No password required, allow access
+      setIsAuthenticated(true)
+      setIsLoading(false)
+      return
+    }
+
+    // Check if user is already authenticated
+    const isAuth = localStorage.getItem('dream-app-authenticated') === 'true'
+    setIsAuthenticated(isAuth)
+    setIsLoading(false)
+  }, [])
+
+  const handleLogout = () => {
+    localStorage.removeItem('dream-app-authenticated')
+    setIsAuthenticated(false)
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
+        <div className="text-slate-600 dark:text-slate-400">Loading...</div>
+      </div>
+    )
+  }
+
+  if (!isAuthenticated) {
+    return <PasswordPrompt onCorrectPassword={() => setIsAuthenticated(true)} />
+  }
 
   return (
     <div className="h-screen flex bg-slate-50 dark:bg-slate-900">
@@ -71,6 +177,18 @@ export function AppLayout({ children }: AppLayoutProps) {
               )
             })}
           </ul>
+
+          {process.env.NEXT_PUBLIC_APP_PASSWORD && (
+            <div className="mt-8 pt-4 border-t border-slate-200 dark:border-slate-700">
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20 w-full"
+              >
+                <Lock className="w-5 h-5" />
+                Logout
+              </button>
+            </div>
+          )}
         </nav>
       </div>
 
