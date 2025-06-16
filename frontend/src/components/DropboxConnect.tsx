@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 interface DropboxConnectProps {
   userId: string;
@@ -19,11 +19,7 @@ export const DropboxConnect: React.FC<DropboxConnectProps> = ({ userId, supabase
   const [connecting, setConnecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    checkConnectionStatus();
-  }, [userId]);
-
-  const checkConnectionStatus = async () => {
+  const checkConnectionStatus = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -50,7 +46,11 @@ export const DropboxConnect: React.FC<DropboxConnectProps> = ({ userId, supabase
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId, supabaseUrl]);
+
+  useEffect(() => {
+    checkConnectionStatus();
+  }, [checkConnectionStatus]);
 
   const handleConnect = async () => {
     try {
@@ -234,7 +234,7 @@ export const DropboxConnect: React.FC<DropboxConnectProps> = ({ userId, supabase
           <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
             <p className="text-sm text-blue-700">
               <strong>How it works:</strong> Upload .m4a files to your Dropbox root folder. 
-              They'll be automatically downloaded, transcribed, and analyzed for dream insights.
+              They&apos;ll be automatically downloaded, transcribed, and analyzed for dream insights.
             </p>
           </div>
         </div>
