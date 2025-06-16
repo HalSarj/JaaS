@@ -2,14 +2,14 @@
 
 **"Capture once, wake up to patterns."**
 
-Personal dream analysis tool that transforms voice recordings into deep psychological insights using Jungian + cognitive frameworks.
+Personal dream analysis tool that automatically processes .m4a files from Dropbox into deep psychological insights using Jungian + cognitive frameworks.
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 - [Supabase Account](https://supabase.com)
+- [Dropbox Developer Account](https://www.dropbox.com/developers/apps) with app created
 - [OpenRouter API Key](https://openrouter.ai) for Claude Sonnet 4 & Whisper
-- iOS device with Shortcuts app
 
 ### 1. Database Setup
 
@@ -25,48 +25,65 @@ npx supabase db push
 
 ```bash
 # Copy and configure environment variables
-cp .env.example .env.local
+cp .env.example .env
 
 # Set your keys:
 # - SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY from Supabase Dashboard
 # - OPENROUTER_API_KEY from OpenRouter
+# - DROPBOX_APP_KEY, DROPBOX_APP_SECRET, DROPBOX_ACCESS_TOKEN from Dropbox App Console
 ```
 
 ### 3. Deploy Edge Functions
 
 ```bash
-# Deploy the analysis pipeline
-npx supabase functions deploy ingest
-npx supabase functions deploy analyze
+# Deploy the webhook handler and analysis pipeline
+supabase functions deploy ingest --no-verify-jwt
+supabase functions deploy analyze
 
 # Set environment variables in Supabase
-npx supabase secrets set OPENROUTER_API_KEY=your-key-here
+supabase secrets set OPENROUTER_API_KEY=your-openrouter-key
+supabase secrets set DROPBOX_APP_SECRET=your-dropbox-app-secret
+supabase secrets set DROPBOX_ACCESS_TOKEN=your-dropbox-access-token
 ```
 
-### 4. iOS Shortcut Setup
+### 4. Dropbox Integration Setup
 
-1. Create new Shortcut in iOS Shortcuts app
-2. Add "Record Audio" action
-3. Add "Get Contents of URL" action with:
-   - URL: `https://your-project.supabase.co/functions/v1/ingest`
-   - Method: POST
-   - Headers: `Authorization: Bearer YOUR_ANON_KEY`
-   - Request Body: Form data with audio file
+#### Configure Dropbox App Permissions
+1. Go to [Dropbox App Console](https://www.dropbox.com/developers/apps)
+2. Select your app
+3. Go to **Permissions** tab and enable:
+   - `files.metadata.read`
+   - `files.content.read`
+4. Generate a new access token
+
+#### Set Up Webhook
+1. In your Dropbox App Console, go to **Webhooks** tab
+2. Add webhook URL: `https://your-project.supabase.co/functions/v1/ingest`
+3. Enable the webhook
+
+#### Test Integration
+```bash
+# Run the setup script to initialize folder monitoring
+node setup-dropbox-monitoring.js
+```
+
+Now upload .m4a files to your Dropbox root directory - they'll be automatically processed!
 
 ## 🏗️ Architecture
 
 ```
-iOS Shortcut → ingest() → analyze() → Database
-     ↓              ↓         ↓         ↓
-  Voice memo → Storage → Whisper → Claude → Insights
+Dropbox Upload → Webhook → ingest() → analyze() → Database
+      ↓            ↓         ↓         ↓         ↓
+   .m4a file → Notification → Download → Whisper → Claude → Insights
 ```
 
 ### Core Components
 
-- **`ingest/`**: Handles audio upload and triggers analysis
+- **`ingest/`**: Dropbox webhook handler with cursor-based change tracking
 - **`analyze/`**: Transcribes with Whisper, analyzes with Claude Sonnet 4
-- **Database**: PostgreSQL with vector embeddings for dream patterns
+- **Database**: PostgreSQL with Dropbox metadata and vector embeddings
 - **Types**: Comprehensive TypeScript definitions for dream analysis
+- **`setup-dropbox-monitoring.js`**: Initial folder monitoring setup script
 
 ## 📊 Features
 
@@ -95,8 +112,8 @@ interface DreamAnalysis {
 ## 📈 Usage
 
 ### Daily Workflow
-1. **Record**: Use iOS Shortcut to capture dream voice memo
-2. **Process**: System automatically transcribes and analyzes
+1. **Record**: Save .m4a dream recordings to Dropbox
+2. **Auto-Process**: Webhook triggers automatic transcription and analysis
 3. **Review**: Check insights and patterns in your dashboard
 4. **Reflect**: Weekly digests highlight key themes
 
@@ -130,7 +147,8 @@ curl -X POST http://localhost:54321/functions/v1/ingest \
 ```
 
 ### Database Schema
-- `dreams`: Core dream records with transcripts and analysis
+- `dreams`: Core dream records with transcripts, analysis, and Dropbox metadata
+- `dropbox_cursor`: Tracks Dropbox changes for webhook processing
 - `recurring_motifs`: Pattern tracking across dreams
 - `weekly_digests`: Periodic summaries and insights
 - `dream_tags`: Flexible categorization system
