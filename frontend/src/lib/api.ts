@@ -1,15 +1,19 @@
-import { supabase } from './supabase'
+import { supabase, getSupabaseClient } from './supabase'
 import { getCurrentUserId } from './auth'
 import { ChatMessage, ChatResponse, Dream } from '@/types/chat'
 
 export class ApiClient {
-  private baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  private baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 
   async sendChatMessage(
     message: string, 
     conversationHistory: ChatMessage[] = [],
     maxDreams: number = 5
   ): Promise<ChatResponse> {
+    if (!this.baseUrl) {
+      throw new Error('Supabase URL not configured')
+    }
+    
     const userId = getCurrentUserId()
     
     const response = await fetch(`${this.baseUrl}/functions/v1/chat`, {
@@ -35,9 +39,10 @@ export class ApiClient {
   }
 
   async getDreams(): Promise<Dream[]> {
+    const client = getSupabaseClient()
     const userId = getCurrentUserId()
     
-    let query = supabase
+    let query = client
       .from('dreams')
       .select('*')
     
@@ -57,9 +62,10 @@ export class ApiClient {
   }
 
   async getDream(id: string): Promise<Dream | null> {
+    const client = getSupabaseClient()
     const userId = getCurrentUserId()
     
-    let query = supabase
+    let query = client
       .from('dreams')
       .select('*')
       .eq('id', id)
@@ -81,9 +87,10 @@ export class ApiClient {
   }
 
   async searchDreams(query: string): Promise<Dream[]> {
+    const client = getSupabaseClient()
     const userId = getCurrentUserId()
     
-    let searchQuery = supabase
+    let searchQuery = client
       .from('dreams')
       .select('*')
     
