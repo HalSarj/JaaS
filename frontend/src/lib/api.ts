@@ -1,4 +1,4 @@
-import { supabase, getSupabaseClient } from './supabase'
+import { getSupabaseClient } from './supabase'
 import { getCurrentUserId } from './auth'
 import { ChatMessage, ChatResponse, Dream } from '@/types/chat'
 
