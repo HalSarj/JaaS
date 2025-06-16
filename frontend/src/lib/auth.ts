@@ -1,13 +1,9 @@
 // Static user ID authentication for single-user deployment
 export const getCurrentUser = () => {
-  const userId = process.env.NEXT_PUBLIC_USER_ID!
-  
-  if (!userId) {
-    throw new Error('NEXT_PUBLIC_USER_ID environment variable is required')
-  }
+  const userId = process.env.NEXT_PUBLIC_USER_ID || null
   
   return {
-    id: userId === 'null' ? null : userId,
+    id: userId === 'null' || !userId ? null : userId,
     // Could add more user properties here if needed in the future
   }
 }
