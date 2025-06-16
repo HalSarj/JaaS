@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Search, Calendar, MessageSquare } from 'lucide-react'
+import { Search, Calendar, MessageSquare, Trash2 } from 'lucide-react'
 import { apiClient } from '@/lib/api'
 import { Dream, DreamAnalysis } from '@/types/chat'
 import { formatRelativeTime, truncateText } from '@/lib/utils'
@@ -80,6 +80,22 @@ function DreamsList({ onDreamSelect }: DreamsListProps) {
     onDreamSelect?.(dream)
   }
 
+  const handleDeleteDream = async (dreamId: string, event: React.MouseEvent) => {
+    event.stopPropagation()
+    
+    if (!confirm('Are you sure you want to delete this dream? This action cannot be undone.')) {
+      return
+    }
+
+    try {
+      await apiClient.deleteDream(dreamId)
+      // Remove from local state
+      setDreams(dreams.filter(dream => dream.id !== dreamId))
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete dream')
+    }
+  }
+
   if (error) {
     return (
       <div className="p-6 text-center text-red-600 dark:text-red-400">
@@ -134,9 +150,18 @@ function DreamsList({ onDreamSelect }: DreamsListProps) {
                       {formatRelativeTime(dream.created_at)}
                     </span>
                   </div>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(dream.status)}`}>
-                    {dream.status}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(dream.status)}`}>
+                      {dream.status}
+                    </span>
+                    <button
+                      onClick={(e) => handleDeleteDream(dream.id, e)}
+                      className="p-1 text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                      title="Delete dream"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="mb-2">
