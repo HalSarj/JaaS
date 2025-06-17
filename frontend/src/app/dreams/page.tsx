@@ -46,7 +46,7 @@ export default function DreamsPage() {
         </div>
 
         {/* View Content */}
-        <div className="flex-1">
+        <div className="flex-1 min-h-0">
           {viewMode === 'list' ? <DreamsList /> : <DreamTimeline />}
         </div>
       </div>

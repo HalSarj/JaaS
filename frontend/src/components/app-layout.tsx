@@ -209,7 +209,7 @@ export function AppLayout({ children }: AppLayoutProps) {
         </div>
 
         {/* Page content */}
-        <main className="flex-1 overflow-hidden">
+        <main className="flex-1 min-h-0">
           {children}
         </main>
       </div>
