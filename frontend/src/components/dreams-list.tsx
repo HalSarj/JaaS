@@ -8,7 +8,7 @@ import { formatRelativeTime, truncateText } from '@/lib/utils'
 import { DreamDetailModal } from './dream-detail-modal'
 
 interface DreamsListProps {
-  onDreamSelect?: (dream: Dream) => void
+  onDreamSelect?: (dream: Dream, prompt?: string) => void
 }
 
 function DreamsList({ onDreamSelect }: DreamsListProps) {
@@ -75,9 +75,9 @@ function DreamsList({ onDreamSelect }: DreamsListProps) {
     setIsModalOpen(true)
   }
 
-  const handleChatWithDream = (dream: Dream) => {
+  const handleChatWithDream = (dream: Dream, prompt?: string) => {
     setIsModalOpen(false)
-    onDreamSelect?.(dream)
+    onDreamSelect?.(dream, prompt)
   }
 
   const handleDeleteDream = async (dreamId: string, event: React.MouseEvent) => {

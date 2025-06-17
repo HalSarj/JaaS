@@ -10,11 +10,11 @@ interface DreamDetailModalProps {
   dream: Dream | null
   isOpen: boolean
   onClose: () => void
-  onChatWithDream?: (dream: Dream) => void
+  onChatWithDream?: (dream: Dream, prompt?: string) => void
 }
 
 export function DreamDetailModal({ dream, isOpen, onClose, onChatWithDream }: DreamDetailModalProps) {
-  const [selectedTab, setSelectedTab] = useState(0)
+  const [selectedTab, setSelectedTab] = useState(0) // Default to Insights tab
   
   if (!dream) return null
 
@@ -122,9 +122,9 @@ export function DreamDetailModal({ dream, isOpen, onClose, onChatWithDream }: Dr
   const dreamScore = getDreamScore()
   
   const tabs = [
-    { name: 'Overview', icon: <BookOpen className="w-4 h-4" /> },
+    { name: 'Insights', icon: <Lightbulb className="w-4 h-4" /> },
     { name: 'Analysis', icon: <Brain className="w-4 h-4" /> },
-    { name: 'Insights', icon: <Lightbulb className="w-4 h-4" /> }
+    { name: 'Overview', icon: <BookOpen className="w-4 h-4" /> }
   ]
 
   return (
@@ -204,7 +204,29 @@ export function DreamDetailModal({ dream, isOpen, onClose, onChatWithDream }: Dr
                       )}
                       {dream.status === 'complete' && onChatWithDream && (
                         <button
-                          onClick={() => onChatWithDream(dream)}
+                          onClick={() => {
+                            // Create a context-aware prompt based on the dream analysis
+                            const dreamSummary = dream.transcript?.substring(0, 150) + (dream.transcript && dream.transcript.length > 150 ? '...' : '')
+                            const mainTheme = Array.isArray(dream.analysis?.themes) && dream.analysis.themes.length > 0 ? dream.analysis.themes[0] : null
+                            const primaryEmotion = dream.analysis?.emotions?.primary?.[0]
+                            const keySymbol = Array.isArray(dream.analysis?.symbols) && dream.analysis.symbols.length > 0 
+                              ? (dream.analysis.symbols[0].item || dream.analysis.symbols[0]) 
+                              : null
+
+                            let contextPrompt = `I'd like to explore this dream from ${formatRelativeTime(dream.created_at)} in more depth:\n\n"${dreamSummary}"`
+                            
+                            if (mainTheme || primaryEmotion || keySymbol) {
+                              contextPrompt += `\n\nThe analysis shows:`
+                              if (mainTheme) contextPrompt += `\n• Main theme: ${mainTheme}`
+                              if (primaryEmotion) contextPrompt += `\n• Primary emotion: ${primaryEmotion}`
+                              if (keySymbol) contextPrompt += `\n• Key symbol: ${keySymbol}`
+                            }
+                            
+                            contextPrompt += `\n\nWhat deeper meanings might this dream reveal about my unconscious mind or current life situation?`
+                            
+                            onChatWithDream(dream, contextPrompt)
+                            onClose()
+                          }}
                           className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 text-sm sm:text-base min-h-[44px] shadow-lg"
                         >
                           <MessageSquare className="w-4 h-4 flex-shrink-0" />
@@ -246,91 +268,8 @@ export function DreamDetailModal({ dream, isOpen, onClose, onChatWithDream }: Dr
                        </Tab.List>
 
                        <Tab.Panels className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+                         {/* First Tab: Insights */}
                          <Tab.Panel>
-                           {/* Overview - Transcript */}
-                           {dream.transcript && (
-                             <div>
-                               <h3 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2 sm:mb-3">
-                                 Dream Transcript
-                               </h3>
-                               <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3 sm:p-4 border border-slate-200 dark:border-slate-700">
-                                 <p className="text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
-                                   {dream.transcript}
-                                 </p>
-                               </div>
-                             </div>
-                           )}
-                         </Tab.Panel>
-
-                         <Tab.Panel>
-                           {/* Analysis Tab */}
-                           <div className="space-y-4 sm:space-y-6">
-                             <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100">
-                               Dream Analysis
-                             </h3>
-                             
-                             {/* Themes */}
-                             {formatAnalysisSection(
-                               'Themes',
-                               dream.analysis.themes,
-                               getAnalysisIcon('themes')
-                             )}
-                             
-                             {/* Emotions */}
-                             {dream.analysis.emotions && (
-                               <div className="mb-6">
-                                 <div className="flex items-center gap-2 mb-3">
-                                   <Heart className="w-5 h-5 text-red-500" />
-                                   <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-                                     Emotions
-                                   </h3>
-                                 </div>
-                                 <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3 sm:p-4 space-y-3 border border-slate-200 dark:border-slate-700">
-                                   {dream.analysis.emotions.primary && (
-                                     <div>
-                                       <h4 className="font-medium text-slate-900 dark:text-slate-100 mb-2 text-sm sm:text-base">Primary</h4>
-                                       <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                                         {dream.analysis.emotions.primary.map((emotion: string, index: number) => (
-                                           <span
-                                             key={index}
-                                             className="px-2 sm:px-3 py-1 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 rounded-full text-xs sm:text-sm font-medium"
-                                           >
-                                             {emotion}
-                                           </span>
-                                         ))}
-                                       </div>
-                                     </div>
-                                   )}
-                                   {dream.analysis.emotions.secondary && (
-                                     <div>
-                                       <h4 className="font-medium text-slate-900 dark:text-slate-100 mb-2 text-sm sm:text-base">Secondary</h4>
-                                       <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                                         {dream.analysis.emotions.secondary.map((emotion: string, index: number) => (
-                                           <span
-                                             key={index}
-                                             className="px-2 sm:px-3 py-1 bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300 rounded-full text-xs sm:text-sm font-medium"
-                                           >
-                                             {emotion}
-                                           </span>
-                                         ))}
-                                       </div>
-                                     </div>
-                                   )}
-                                 </div>
-                               </div>
-                             )}
-                             
-                             {/* Symbols */}
-                             {formatAnalysisSection(
-                               'Symbols',
-                               dream.analysis.symbols,
-                               getAnalysisIcon('symbols')
-                             )}
-                           </div>
-                         </Tab.Panel>
-
-                         <Tab.Panel>
-                           {/* Insights Tab */}
                            <div className="space-y-4 sm:space-y-6">
                              <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100">
                                Deep Insights
@@ -420,6 +359,89 @@ export function DreamDetailModal({ dream, isOpen, onClose, onChatWithDream }: Dr
                                </div>
                              </div>
                            </div>
+                         </Tab.Panel>
+
+                         {/* Second Tab: Analysis */}
+                         <Tab.Panel>
+                           <div className="space-y-4 sm:space-y-6">
+                             <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100">
+                               Dream Analysis
+                             </h3>
+                             
+                             {/* Themes */}
+                             {formatAnalysisSection(
+                               'Themes',
+                               dream.analysis.themes,
+                               getAnalysisIcon('themes')
+                             )}
+                             
+                             {/* Emotions */}
+                             {dream.analysis.emotions && (
+                               <div className="mb-6">
+                                 <div className="flex items-center gap-2 mb-3">
+                                   <Heart className="w-5 h-5 text-red-500" />
+                                   <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+                                     Emotions
+                                   </h3>
+                                 </div>
+                                 <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3 sm:p-4 space-y-3 border border-slate-200 dark:border-slate-700">
+                                   {dream.analysis.emotions.primary && (
+                                     <div>
+                                       <h4 className="font-medium text-slate-900 dark:text-slate-100 mb-2 text-sm sm:text-base">Primary</h4>
+                                       <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                                         {dream.analysis.emotions.primary.map((emotion: string, index: number) => (
+                                           <span
+                                             key={index}
+                                             className="px-2 sm:px-3 py-1 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 rounded-full text-xs sm:text-sm font-medium"
+                                           >
+                                             {emotion}
+                                           </span>
+                                         ))}
+                                       </div>
+                                     </div>
+                                   )}
+                                   {dream.analysis.emotions.secondary && (
+                                     <div>
+                                       <h4 className="font-medium text-slate-900 dark:text-slate-100 mb-2 text-sm sm:text-base">Secondary</h4>
+                                       <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                                         {dream.analysis.emotions.secondary.map((emotion: string, index: number) => (
+                                           <span
+                                             key={index}
+                                             className="px-2 sm:px-3 py-1 bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300 rounded-full text-xs sm:text-sm font-medium"
+                                           >
+                                             {emotion}
+                                           </span>
+                                         ))}
+                                       </div>
+                                     </div>
+                                   )}
+                                 </div>
+                               </div>
+                             )}
+                             
+                             {/* Symbols */}
+                             {formatAnalysisSection(
+                               'Symbols',
+                               dream.analysis.symbols,
+                               getAnalysisIcon('symbols')
+                             )}
+                           </div>
+                         </Tab.Panel>
+
+                         {/* Third Tab: Overview */}
+                         <Tab.Panel>
+                           {dream.transcript && (
+                             <div>
+                               <h3 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2 sm:mb-3">
+                                 Dream Transcript
+                               </h3>
+                               <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3 sm:p-4 border border-slate-200 dark:border-slate-700">
+                                 <p className="text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
+                                   {dream.transcript}
+                                 </p>
+                               </div>
+                             </div>
+                           )}
                          </Tab.Panel>
                        </Tab.Panels>
                      </Tab.Group>
