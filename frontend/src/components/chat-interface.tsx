@@ -9,12 +9,14 @@ import { ChatMessage, DreamReference } from '@/types/chat'
 import { cn, formatRelativeTime } from '@/lib/utils'
 
 const SUGGESTED_PROMPTS = [
-  "What patterns do you see in my dreams?",
-  "Analyze the recurring water symbolism", 
-  "How have my emotions changed over time?",
-  "What does my latest dream mean?",
-  "Show me dreams about flying",
-  "What are my most common dream themes?"
+  "What do my recent anxiety dreams reveal about my current stress?",
+  "Find patterns in my recurring symbols and what they mean",
+  "What is my unconscious trying to tell me through these dreams?",
+  "Show me how my dream themes have evolved over time",
+  "What archetypal patterns appear most in my dreams?",
+  "What does my shadow self reveal in these dreams?",
+  "What collective symbols appear across my dream journal?",
+  "What unresolved emotions keep appearing in my dreams?"
 ]
 
 export function ChatInterface() {
