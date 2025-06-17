@@ -277,9 +277,8 @@ export function ChatInterface() {
       )}
 
       {/* Input */}
-      <div className="relative border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 safe-area-inset-bottom">
-        <div className="absolute inset-x-0 top-0 bottom-0 bg-white dark:bg-slate-800"></div>
-        <div className="relative p-3 sm:p-4 pb-4 sm:pb-4">
+      <div className="border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+        <div className="p-3 sm:p-4 pb-6 sm:pb-4 safe-area-inset-bottom">
         <div className="flex gap-2 sm:gap-3">
           <textarea
             ref={inputRef}
