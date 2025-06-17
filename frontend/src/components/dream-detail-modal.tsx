@@ -196,7 +196,7 @@ export function DreamDetailModal({ dream, isOpen, onClose, onChatWithDream }: Dr
               Archetypal Presences
             </h4>
             <div className="grid gap-3">
-              {jungian.archetypes.map((archetype: any, index: number) => (
+              {jungian.archetypes.map((archetype, index: number) => (
                 <div key={index} className="border border-slate-200 dark:border-slate-700 rounded-lg p-3">
                   <div className="flex items-center justify-between mb-2">
                     <h5 className="font-medium text-slate-800 dark:text-slate-200">{archetype.archetype}</h5>
@@ -276,7 +276,7 @@ export function DreamDetailModal({ dream, isOpen, onClose, onChatWithDream }: Dr
           <div>
             <h4 className="font-medium text-slate-900 dark:text-slate-100 mb-3">Collective Symbols</h4>
             <div className="grid gap-2">
-              {jungian.collective_symbols.map((symbol: any, index: number) => (
+              {jungian.collective_symbols.map((symbol, index: number) => (
                 <div key={index} className="flex items-start gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                   <div className="flex-shrink-0 w-2 h-2 rounded-full bg-blue-500 mt-2"></div>
                   <div className="min-w-0 flex-1">
