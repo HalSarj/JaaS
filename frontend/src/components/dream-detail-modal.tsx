@@ -73,7 +73,7 @@ export function DreamDetailModal({ dream, isOpen, onClose, onChatWithDream }: Dr
           title: 'My Dream Analysis',
           text: `Dream from ${formatRelativeTime(dream.created_at)}: ${dream.transcript?.substring(0, 100)}...`,
         })
-      } catch (error) {
+      } catch {
         console.log('Share cancelled')
       }
     } else {
@@ -227,7 +227,7 @@ export function DreamDetailModal({ dream, isOpen, onClose, onChatWithDream }: Dr
                    {dream.status === 'complete' && dream.analysis ? (
                      <Tab.Group selectedIndex={selectedTab} onChange={setSelectedTab}>
                        <Tab.List className="flex border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
-                         {tabs.map((tab, index) => (
+                         {tabs.map((tab) => (
                            <Tab
                              key={tab.name}
                              className={({ selected }) =>
