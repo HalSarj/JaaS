@@ -203,86 +203,89 @@ export function DreamTimeline() {
 
   return (
     <div className="h-full flex flex-col bg-white dark:bg-slate-900">
-      {/* Controls and Pattern Overview */}
+      {/* Controls Only */}
       <div className="border-b border-slate-200 dark:border-slate-700 p-3 sm:p-4">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <label className="text-sm text-slate-600 dark:text-slate-400">Group by:</label>
-            <select
-              value={groupBy}
-              onChange={(e) => setGroupBy(e.target.value as 'day' | 'week' | 'month')}
-              className="text-sm border border-slate-200 dark:border-slate-700 rounded-md px-2 py-1 bg-white dark:bg-slate-800 dark:text-slate-100"
-            >
-              <option value="day">Day</option>
-              <option value="week">Week</option>
-              <option value="month">Month</option>
-            </select>
-          </div>
-        </div>
-        
-        {/* Pattern Overview */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
-          <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3">
-            <div className="flex items-center gap-2 mb-2">
-              <Brain className="w-4 h-4 text-purple-500" />
-              <span className="font-medium text-slate-900 dark:text-slate-100">Top Themes</span>
-            </div>
-            <div className="space-y-1">
-              {Object.entries(patternData.themes)
-                .sort(([,a], [,b]) => b - a)
-                .slice(0, 3)
-                .map(([theme, count]) => (
-                  <div key={theme} className="flex items-center justify-between">
-                    <span className="text-slate-600 dark:text-slate-400 truncate">{theme}</span>
-                    <span className="text-xs text-slate-500 dark:text-slate-500">{count}</span>
-                  </div>
-                ))
-              }
-            </div>
-          </div>
-          
-          <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3">
-            <div className="flex items-center gap-2 mb-2">
-              <TrendingUp className="w-4 h-4 text-blue-500" />
-              <span className="font-medium text-slate-900 dark:text-slate-100">Emotions</span>
-            </div>
-            <div className="space-y-1">
-              {Object.entries(patternData.emotions)
-                .sort(([,a], [,b]) => b - a)
-                .slice(0, 3)
-                .map(([emotion, count]) => (
-                  <div key={emotion} className="flex items-center justify-between">
-                    <span className="text-slate-600 dark:text-slate-400 truncate">{emotion}</span>
-                    <span className="text-xs text-slate-500 dark:text-slate-500">{count}</span>
-                  </div>
-                ))
-              }
-            </div>
-          </div>
-          
-          <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3">
-            <div className="flex items-center gap-2 mb-2">
-              <Eye className="w-4 h-4 text-green-500" />
-              <span className="font-medium text-slate-900 dark:text-slate-100">Symbols</span>
-            </div>
-            <div className="space-y-1">
-              {Object.entries(patternData.symbols)
-                .sort(([,a], [,b]) => b - a)
-                .slice(0, 3)
-                .map(([symbol, count]) => (
-                  <div key={symbol} className="flex items-center justify-between">
-                    <span className="text-slate-600 dark:text-slate-400 truncate">{symbol}</span>
-                    <span className="text-xs text-slate-500 dark:text-slate-500">{count}</span>
-                  </div>
-                ))
-              }
-            </div>
-          </div>
+        <div className="flex items-center gap-2">
+          <label className="text-sm text-slate-600 dark:text-slate-400">Group by:</label>
+          <select
+            value={groupBy}
+            onChange={(e) => setGroupBy(e.target.value as 'day' | 'week' | 'month')}
+            className="text-sm border border-slate-200 dark:border-slate-700 rounded-md px-2 py-1 bg-white dark:bg-slate-800 dark:text-slate-100"
+          >
+            <option value="day">Day</option>
+            <option value="week">Week</option>
+            <option value="month">Month</option>
+          </select>
         </div>
       </div>
 
-      {/* Timeline */}
-      <div className="flex-1 overflow-y-auto p-3 sm:p-4">
+      {/* Scrollable Timeline with Pattern Overview */}
+      <div className="flex-1 overflow-y-auto">
+        {/* Pattern Overview - Now Scrollable */}
+        <div className="p-3 sm:p-4 border-b border-slate-200 dark:border-slate-700">
+          <h3 className="text-sm font-medium text-slate-900 dark:text-slate-100 mb-3">Pattern Overview</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+            <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3">
+              <div className="flex items-center gap-2 mb-2">
+                <Brain className="w-4 h-4 text-purple-500" />
+                <span className="font-medium text-slate-900 dark:text-slate-100">Top Themes</span>
+              </div>
+              <div className="space-y-1">
+                {Object.entries(patternData.themes)
+                  .sort(([,a], [,b]) => b - a)
+                  .slice(0, 3)
+                  .map(([theme, count]) => (
+                    <div key={theme} className="flex items-center justify-between">
+                      <span className="text-slate-600 dark:text-slate-400 truncate">{theme}</span>
+                      <span className="text-xs text-slate-500 dark:text-slate-500">{count}</span>
+                    </div>
+                  ))
+                }
+              </div>
+            </div>
+            
+            <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3">
+              <div className="flex items-center gap-2 mb-2">
+                <TrendingUp className="w-4 h-4 text-blue-500" />
+                <span className="font-medium text-slate-900 dark:text-slate-100">Emotions</span>
+              </div>
+              <div className="space-y-1">
+                {Object.entries(patternData.emotions)
+                  .sort(([,a], [,b]) => b - a)
+                  .slice(0, 3)
+                  .map(([emotion, count]) => (
+                    <div key={emotion} className="flex items-center justify-between">
+                      <span className="text-slate-600 dark:text-slate-400 truncate">{emotion}</span>
+                      <span className="text-xs text-slate-500 dark:text-slate-500">{count}</span>
+                    </div>
+                  ))
+                }
+              </div>
+            </div>
+            
+            <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3">
+              <div className="flex items-center gap-2 mb-2">
+                <Eye className="w-4 h-4 text-green-500" />
+                <span className="font-medium text-slate-900 dark:text-slate-100">Symbols</span>
+              </div>
+              <div className="space-y-1">
+                {Object.entries(patternData.symbols)
+                  .sort(([,a], [,b]) => b - a)
+                  .slice(0, 3)
+                  .map(([symbol, count]) => (
+                    <div key={symbol} className="flex items-center justify-between">
+                      <span className="text-slate-600 dark:text-slate-400 truncate">{symbol}</span>
+                      <span className="text-xs text-slate-500 dark:text-slate-500">{count}</span>
+                    </div>
+                  ))
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Timeline Content */}
+        <div className="p-3 sm:p-4">
         <div className="relative">
           {/* Timeline Line */}
           <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-slate-200 dark:bg-slate-700"></div>
@@ -358,6 +361,7 @@ export function DreamTimeline() {
               </div>
             ))}
           </div>
+        </div>
         </div>
       </div>
 
