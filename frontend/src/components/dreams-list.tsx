@@ -106,13 +106,8 @@ function DreamsList({ onDreamSelect }: DreamsListProps) {
 
   return (
     <div className="h-full flex flex-col bg-white dark:bg-slate-900">
-      {/* Header */}
+      {/* Search */}
       <div className="border-b border-slate-200 dark:border-slate-700 p-3 sm:p-4">
-        <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-100 mb-3 sm:mb-4">
-          Your Dreams
-        </h2>
-        
-        {/* Search */}
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
           <input
