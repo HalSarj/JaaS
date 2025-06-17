@@ -242,27 +242,29 @@ export function ChatInterface() {
 
       {/* Dream References */}
       {dreamReferences.length > 0 && (
-        <div className="border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-3 sm:p-4">
+        <div className="border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-3 sm:p-4 min-w-0">
           <div className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
             Referenced Dreams ({dreamReferences.length})
           </div>
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600">
-            {dreamReferences.map((dream) => (
-              <div
-                key={dream.id}
-                className="flex-shrink-0 bg-slate-50 dark:bg-slate-700 rounded-lg p-3 min-w-[180px] sm:min-w-[200px] border border-slate-200 dark:border-slate-600"
-              >
-                <div className="text-xs text-slate-500 dark:text-slate-400 mb-1">
-                  {formatRelativeTime(dream.created_at)}
+          <div className="w-full overflow-hidden">
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600 -mx-1 px-1">
+              {dreamReferences.map((dream) => (
+                <div
+                  key={dream.id}
+                  className="flex-shrink-0 bg-slate-50 dark:bg-slate-700 rounded-lg p-3 w-[160px] sm:w-[180px] border border-slate-200 dark:border-slate-600"
+                >
+                  <div className="text-xs text-slate-500 dark:text-slate-400 mb-1 truncate">
+                    {formatRelativeTime(dream.created_at)}
+                  </div>
+                  <div className="text-sm text-slate-700 dark:text-slate-300 line-clamp-2 break-words">
+                    {dream.transcript?.substring(0, 70)}...
+                  </div>
+                  <div className="text-xs text-purple-600 dark:text-purple-400 mt-1">
+                    {Math.round(dream.similarity_score * 100)}% match
+                  </div>
                 </div>
-                <div className="text-sm text-slate-700 dark:text-slate-300 line-clamp-2">
-                  {dream.transcript?.substring(0, 80)}...
-                </div>
-                <div className="text-xs text-purple-600 dark:text-purple-400 mt-1">
-                  {Math.round(dream.similarity_score * 100)}% match
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       )}
