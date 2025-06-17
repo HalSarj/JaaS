@@ -85,7 +85,12 @@ export function DreamDetailModal({ dream, isOpen, onClose, onChatWithDream }: Dr
   }
 
   // Specialized formatting functions
-  const formatSentimentAnalysis = (sentiment: any) => {
+  const formatSentimentAnalysis = (sentiment: {
+    overall?: number;
+    emotional_intensity?: number;
+    progression?: number[];
+    polarity_shifts?: number;
+  }) => {
     if (!sentiment) return null;
     
     return (
@@ -93,17 +98,17 @@ export function DreamDetailModal({ dream, isOpen, onClose, onChatWithDream }: Dr
         {/* Overall Sentiment */}
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-4 rounded-lg">
           <h4 className="font-medium text-blue-700 dark:text-blue-300 mb-2">Overall Sentiment</h4>
-          <div className="flex items-center gap-2">
-            <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-              <div 
-                className={`h-2 rounded-full ${sentiment.overall >= 0 ? 'bg-green-500' : 'bg-red-500'}`}
-                style={{ width: `${Math.abs(sentiment.overall) * 100}%` }}
-              />
+                      <div className="flex items-center gap-2">
+              <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                <div 
+                  className={`h-2 rounded-full ${(sentiment.overall ?? 0) >= 0 ? 'bg-green-500' : 'bg-red-500'}`}
+                  style={{ width: `${Math.abs(sentiment.overall ?? 0) * 100}%` }}
+                />
+              </div>
+              <span className="text-sm font-mono">
+                {(sentiment.overall ?? 0) > 0 ? '+' : ''}{((sentiment.overall ?? 0) * 100).toFixed(0)}%
+              </span>
             </div>
-            <span className="text-sm font-mono">
-              {sentiment.overall > 0 ? '+' : ''}{(sentiment.overall * 100).toFixed(0)}%
-            </span>
-          </div>
         </div>
 
         {/* Emotional Intensity */}
@@ -148,7 +153,7 @@ export function DreamDetailModal({ dream, isOpen, onClose, onChatWithDream }: Dr
         )}
 
         {/* Polarity Shifts */}
-        {sentiment.polarity_shifts > 0 && (
+        {(sentiment.polarity_shifts ?? 0) > 0 && (
           <div className="col-span-full flex items-center gap-2 p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
             <TrendingUp className="w-4 h-4 text-amber-600" />
             <span className="text-sm text-amber-700 dark:text-amber-300">
@@ -160,7 +165,25 @@ export function DreamDetailModal({ dream, isOpen, onClose, onChatWithDream }: Dr
     );
   };
 
-  const formatJungianAnalysis = (jungian: any) => {
+  const formatJungianAnalysis = (jungian: {
+    archetypes?: Array<{
+      archetype: string;
+      manifestation: string;
+      strength: number;
+      interpretation: string;
+    }>;
+    persona_vs_shadow?: {
+      persona_elements?: string[];
+      shadow_elements?: string[];
+      integration_opportunities?: string[];
+    };
+    collective_symbols?: Array<{
+      symbol: string;
+      interpretation: string;
+      confidence: number;
+      cultural_context: string;
+    }>;
+  }) => {
     if (!jungian) return null;
 
     return (
@@ -275,7 +298,15 @@ export function DreamDetailModal({ dream, isOpen, onClose, onChatWithDream }: Dr
     );
   };
 
-  const formatSymbolAnalysis = (symbols: any[]) => {
+  const formatSymbolAnalysis = (symbols: Array<{
+    item: string;
+    context: string;
+    confidence?: number;
+    emotional_charge?: number;
+    interpretation: string;
+    personal_associations?: string[];
+    universal_meanings?: string[];
+  }>) => {
     if (!symbols || !Array.isArray(symbols)) return null;
 
     return (
@@ -304,7 +335,7 @@ export function DreamDetailModal({ dream, isOpen, onClose, onChatWithDream }: Dr
                 </div>
               </div>
               
-              <p className="text-sm text-slate-600 dark:text-slate-400 mb-3 italic">"{symbol.context}"</p>
+                             <p className="text-sm text-slate-600 dark:text-slate-400 mb-3 italic">&ldquo;{symbol.context}&rdquo;</p>
               
               <div className="mb-3">
                 <p className="text-sm text-slate-700 dark:text-slate-300 font-medium mb-1">Interpretation:</p>
@@ -345,7 +376,15 @@ export function DreamDetailModal({ dream, isOpen, onClose, onChatWithDream }: Dr
     );
   };
 
-  const formatEmotionalAnalysis = (emotions: any) => {
+  const formatEmotionalAnalysis = (emotions: {
+    primary?: string[];
+    secondary?: string[];
+    emotional_arc?: {
+      beginning?: string[];
+      middle?: string[];
+      end?: string[];
+    };
+  }) => {
     if (!emotions) return null;
 
     return (
@@ -390,8 +429,8 @@ export function DreamDetailModal({ dream, isOpen, onClose, onChatWithDream }: Dr
           <div>
             <h4 className="font-medium text-slate-900 dark:text-slate-100 mb-3">Emotional Journey</h4>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {['beginning', 'middle', 'end'].map((phase) => {
-                const phaseEmotions = emotions.emotional_arc[phase];
+              {(['beginning', 'middle', 'end'] as const).map((phase) => {
+                const phaseEmotions = emotions.emotional_arc?.[phase];
                 if (!phaseEmotions || phaseEmotions.length === 0) return null;
                 
                 return (
