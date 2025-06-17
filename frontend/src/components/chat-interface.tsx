@@ -93,10 +93,10 @@ export function ChatInterface() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-900">
+    <div className="flex flex-col h-screen bg-slate-50 dark:bg-slate-900 relative">
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-6">
+      <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-6 pb-32 md:pb-24">
         {messages.length === 0 ? (
           <div className="text-center py-12">
             <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -231,7 +231,7 @@ export function ChatInterface() {
 
       {/* Dream References */}
       {dreamReferences.length > 0 && (
-        <div className="border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+        <div className="fixed bottom-20 sm:bottom-16 left-0 right-0 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 z-10">
           {/* Collapsible Header */}
           <button
             onClick={() => setIsReferencesExpanded(!isReferencesExpanded)}
@@ -250,7 +250,7 @@ export function ChatInterface() {
           
           {/* Expandable Content */}
           {isReferencesExpanded && (
-            <div className="px-3 sm:px-4 pb-3 sm:pb-4">
+            <div className="px-3 sm:px-4 pb-3 sm:pb-4 max-h-48 overflow-y-auto">
               <div className="overflow-x-auto">
                 <div className="flex gap-2 pb-2 min-w-max">
                   {dreamReferences.map((dream) => (
@@ -277,7 +277,7 @@ export function ChatInterface() {
       )}
 
       {/* Input */}
-      <div className="border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+      <div className="fixed bottom-0 left-0 right-0 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 z-10">
         <div className="p-3 sm:p-4 pb-6 sm:pb-4 safe-area-inset-bottom">
         <div className="flex gap-2 sm:gap-3">
           <textarea
