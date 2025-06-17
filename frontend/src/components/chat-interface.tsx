@@ -275,7 +275,9 @@ export function ChatInterface() {
       )}
 
       {/* Input */}
-      <div className="border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-3 sm:p-4 pb-6 sm:pb-8 mb-4 sm:mb-6 safe-area-inset-bottom">
+      <div className="relative border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 safe-area-inset-bottom">
+        <div className="absolute inset-x-0 top-0 bottom-0 bg-white dark:bg-slate-800"></div>
+        <div className="relative p-3 sm:p-4 pb-6 sm:pb-8">
         <div className="flex gap-2 sm:gap-3">
           <textarea
             ref={inputRef}
@@ -299,6 +301,7 @@ export function ChatInterface() {
             )}
             <span className="hidden sm:inline">Send</span>
           </button>
+        </div>
         </div>
       </div>
     </div>
