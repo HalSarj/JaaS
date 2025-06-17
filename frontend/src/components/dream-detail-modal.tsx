@@ -2,7 +2,7 @@
 
 import { Fragment, useState } from 'react'
 import { Dialog, Transition, Tab } from '@headlessui/react'
-import { X, Calendar, MessageSquare, Brain, Heart, Eye, BookOpen, Lightbulb, TrendingUp, Star, Download, Share2, Sun, Moon, BarChart3, Target, HelpCircle } from 'lucide-react'
+import { X, Calendar, MessageSquare, Brain, Heart, Eye, BookOpen, Lightbulb, TrendingUp, Star, Download, Share2, Sun, Moon, BarChart3, Target, HelpCircle, Shield, Zap, Cog, Archive, AlertTriangle, CheckCircle2 } from 'lucide-react'
 import { Dream } from '@/types/chat'
 import { formatRelativeTime, cn } from '@/lib/utils'
 
@@ -451,6 +451,273 @@ export function DreamDetailModal({ dream, isOpen, onClose, onChatWithDream }: Dr
     );
   };
 
+  const formatCognitiveAnalysis = (cognitive: {
+    problem_solving?: {
+      creative_solutions?: string[];
+      rehearsal_scenarios?: string[];
+      alternative_perspectives?: string[];
+    };
+    threat_simulation?: {
+      present: boolean;
+      type?: string;
+      adaptive_value?: string;
+    };
+    emotional_regulation?: {
+      coping_mechanisms?: string[];
+      integration_attempts?: string[];
+      unresolved_conflicts?: string[];
+    };
+    memory_consolidation?: {
+      episodic_memories?: string[];
+      procedural_learning?: string[];
+      emotional_processing?: string[];
+    };
+  }) => {
+    if (!cognitive) return null;
+
+    return (
+      <div className="space-y-6">
+        {/* Cognitive Functions Overview */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Problem Solving */}
+          {cognitive.problem_solving && (
+            <div className="bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 p-4 rounded-lg border border-emerald-200 dark:border-emerald-800">
+              <div className="flex items-center gap-2 mb-2">
+                <Lightbulb className="w-4 h-4 text-emerald-600" />
+                <h4 className="font-medium text-emerald-800 dark:text-emerald-200">Problem Solving</h4>
+              </div>
+              <div className="text-xs text-emerald-600 dark:text-emerald-400">
+                {[
+                  ...(cognitive.problem_solving.creative_solutions || []),
+                  ...(cognitive.problem_solving.rehearsal_scenarios || []),
+                  ...(cognitive.problem_solving.alternative_perspectives || [])
+                ].length} insights detected
+              </div>
+            </div>
+          )}
+
+          {/* Threat Simulation */}
+          {cognitive.threat_simulation && (
+            <div className={`p-4 rounded-lg border ${
+              cognitive.threat_simulation.present 
+                ? 'bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border-orange-200 dark:border-orange-800'
+                : 'bg-gradient-to-br from-slate-50 to-gray-50 dark:from-slate-900/20 dark:to-gray-900/20 border-slate-200 dark:border-slate-700'
+            }`}>
+              <div className="flex items-center gap-2 mb-2">
+                <Shield className={`w-4 h-4 ${cognitive.threat_simulation.present ? 'text-orange-600' : 'text-slate-500'}`} />
+                <h4 className={`font-medium ${
+                  cognitive.threat_simulation.present 
+                    ? 'text-orange-800 dark:text-orange-200' 
+                    : 'text-slate-700 dark:text-slate-300'
+                }`}>
+                  Threat Simulation
+                </h4>
+              </div>
+              <div className={`text-xs ${
+                cognitive.threat_simulation.present 
+                  ? 'text-orange-600 dark:text-orange-400'
+                  : 'text-slate-500 dark:text-slate-400'
+              }`}>
+                {cognitive.threat_simulation.present ? 'Active' : 'Inactive'}
+              </div>
+            </div>
+          )}
+
+          {/* Emotional Regulation */}
+          {cognitive.emotional_regulation && (
+            <div className="bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20 p-4 rounded-lg border border-purple-200 dark:border-purple-800">
+              <div className="flex items-center gap-2 mb-2">
+                <Heart className="w-4 h-4 text-purple-600" />
+                <h4 className="font-medium text-purple-800 dark:text-purple-200">Emotional Regulation</h4>
+              </div>
+              <div className="text-xs text-purple-600 dark:text-purple-400">
+                {(cognitive.emotional_regulation.coping_mechanisms?.length || 0)} mechanisms
+              </div>
+            </div>
+          )}
+
+          {/* Memory Consolidation */}
+          {cognitive.memory_consolidation && (
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+              <div className="flex items-center gap-2 mb-2">
+                <Archive className="w-4 h-4 text-blue-600" />
+                <h4 className="font-medium text-blue-800 dark:text-blue-200">Memory Processing</h4>
+              </div>
+              <div className="text-xs text-blue-600 dark:text-blue-400">
+                {[
+                  ...(cognitive.memory_consolidation.episodic_memories || []),
+                  ...(cognitive.memory_consolidation.procedural_learning || []),
+                  ...(cognitive.memory_consolidation.emotional_processing || [])
+                ].length} memories processed
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Detailed Sections */}
+        {/* Problem Solving Details */}
+        {cognitive.problem_solving && (
+          <div>
+            <h4 className="font-medium text-slate-900 dark:text-slate-100 mb-3 flex items-center gap-2">
+              <Zap className="w-4 h-4 text-emerald-500" />
+              Problem-Solving Patterns
+            </h4>
+            
+            <div className="grid gap-4">
+              {cognitive.problem_solving.creative_solutions && cognitive.problem_solving.creative_solutions.length > 0 && (
+                <div className="border border-slate-200 dark:border-slate-700 rounded-lg p-4">
+                  <h5 className="font-medium text-slate-800 dark:text-slate-200 mb-2 flex items-center gap-2">
+                    <Lightbulb className="w-4 h-4 text-yellow-500" />
+                    Creative Solutions
+                  </h5>
+                  <div className="space-y-2">
+                    {cognitive.problem_solving.creative_solutions.map((solution, index) => (
+                      <div key={index} className="flex items-start gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                        <span className="text-sm text-slate-600 dark:text-slate-400">{solution}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {cognitive.problem_solving.alternative_perspectives && cognitive.problem_solving.alternative_perspectives.length > 0 && (
+                <div className="border border-slate-200 dark:border-slate-700 rounded-lg p-4">
+                  <h5 className="font-medium text-slate-800 dark:text-slate-200 mb-2 flex items-center gap-2">
+                    <Eye className="w-4 h-4 text-blue-500" />
+                    Alternative Perspectives
+                  </h5>
+                  <div className="space-y-2">
+                    {cognitive.problem_solving.alternative_perspectives.map((perspective, index) => (
+                      <div key={index} className="flex items-start gap-2">
+                        <div className="w-2 h-2 rounded-full bg-blue-400 mt-2 flex-shrink-0"></div>
+                        <span className="text-sm text-slate-600 dark:text-slate-400">{perspective}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Threat Simulation Details */}
+        {cognitive.threat_simulation?.present && (
+          <div>
+            <h4 className="font-medium text-slate-900 dark:text-slate-100 mb-3 flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-orange-500" />
+              Threat Simulation Active
+            </h4>
+            
+            <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-4">
+              {cognitive.threat_simulation.type && (
+                <div className="mb-3">
+                  <span className="text-sm font-medium text-orange-800 dark:text-orange-200">Threat Type: </span>
+                  <span className="text-sm text-orange-700 dark:text-orange-300 capitalize">{cognitive.threat_simulation.type}</span>
+                </div>
+              )}
+              {cognitive.threat_simulation.adaptive_value && (
+                <div>
+                  <span className="text-sm font-medium text-orange-800 dark:text-orange-200">Adaptive Value: </span>
+                  <span className="text-sm text-orange-700 dark:text-orange-300">{cognitive.threat_simulation.adaptive_value}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Emotional Regulation Details */}
+        {cognitive.emotional_regulation && (
+          <div>
+            <h4 className="font-medium text-slate-900 dark:text-slate-100 mb-3 flex items-center gap-2">
+              <Cog className="w-4 h-4 text-purple-500" />
+              Emotional Regulation Strategies
+            </h4>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {cognitive.emotional_regulation.coping_mechanisms && cognitive.emotional_regulation.coping_mechanisms.length > 0 && (
+                <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                  <h5 className="font-medium text-green-800 dark:text-green-200 mb-2 flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4" />
+                    Coping Mechanisms
+                  </h5>
+                  <div className="space-y-1">
+                    {cognitive.emotional_regulation.coping_mechanisms.map((mechanism, index) => (
+                      <div key={index} className="text-sm text-green-700 dark:text-green-300">• {mechanism}</div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {cognitive.emotional_regulation.unresolved_conflicts && cognitive.emotional_regulation.unresolved_conflicts.length > 0 && (
+                <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+                  <h5 className="font-medium text-amber-800 dark:text-amber-200 mb-2 flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4" />
+                    Unresolved Conflicts
+                  </h5>
+                  <div className="space-y-1">
+                    {cognitive.emotional_regulation.unresolved_conflicts.map((conflict, index) => (
+                      <div key={index} className="text-sm text-amber-700 dark:text-amber-300">• {conflict}</div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {cognitive.emotional_regulation.integration_attempts && cognitive.emotional_regulation.integration_attempts.length > 0 && (
+              <div className="mt-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                <h5 className="font-medium text-blue-800 dark:text-blue-200 mb-2 flex items-center gap-2">
+                  <Target className="w-4 h-4" />
+                  Integration Attempts
+                </h5>
+                <div className="space-y-1">
+                  {cognitive.emotional_regulation.integration_attempts.map((attempt, index) => (
+                    <div key={index} className="text-sm text-blue-700 dark:text-blue-300">• {attempt}</div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Memory Consolidation Details */}
+        {cognitive.memory_consolidation && (
+          <div>
+            <h4 className="font-medium text-slate-900 dark:text-slate-100 mb-3 flex items-center gap-2">
+              <Archive className="w-4 h-4 text-blue-500" />
+              Memory Consolidation Patterns
+            </h4>
+            
+            <div className="grid gap-4">
+              {[
+                { key: 'episodic_memories', label: 'Episodic Memories', color: 'indigo', icon: BookOpen },
+                { key: 'procedural_learning', label: 'Procedural Learning', color: 'green', icon: Cog },
+                { key: 'emotional_processing', label: 'Emotional Processing', color: 'purple', icon: Heart }
+              ].map(({ key, label, color, icon: Icon }) => {
+                const memories = cognitive.memory_consolidation?.[key as keyof typeof cognitive.memory_consolidation] as string[] | undefined;
+                if (!memories?.length) return null;
+
+                return (
+                  <div key={key} className={`bg-${color}-50 dark:bg-${color}-900/20 border border-${color}-200 dark:border-${color}-800 rounded-lg p-4`}>
+                    <h5 className={`font-medium text-${color}-800 dark:text-${color}-200 mb-2 flex items-center gap-2`}>
+                      <Icon className={`w-4 h-4 text-${color}-600`} />
+                      {label}
+                    </h5>
+                    <div className="space-y-1">
+                      {memories.map((memory, index) => (
+                        <div key={index} className={`text-sm text-${color}-700 dark:text-${color}-300`}>• {memory}</div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const formatQuestionsToExplore = (questions: string[]) => {
     if (!questions || !Array.isArray(questions)) return null;
 
@@ -560,6 +827,22 @@ export function DreamDetailModal({ dream, isOpen, onClose, onChatWithDream }: Dr
           </div>
           <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3 sm:p-4 border border-slate-200 dark:border-slate-700">
             {formatQuestionsToExplore(data)}
+          </div>
+        </div>
+      )
+    }
+
+    if (title.includes('Cognitive') && typeof data === 'object') {
+      return (
+        <div className="mb-4 sm:mb-6">
+          <div className="flex items-center gap-2 mb-2 sm:mb-3">
+            {icon}
+            <h3 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-100">
+              {title}
+            </h3>
+          </div>
+          <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3 sm:p-4 border border-slate-200 dark:border-slate-700">
+            {formatCognitiveAnalysis(data)}
           </div>
         </div>
       )
