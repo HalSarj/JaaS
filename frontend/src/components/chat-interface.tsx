@@ -92,22 +92,6 @@ export function ChatInterface() {
 
   return (
     <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-900">
-      {/* Header */}
-      <div className="border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 sm:px-6 py-3 sm:py-4">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
-            <Brain className="w-4 h-4 text-white" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <h1 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-100 truncate">
-              Dream Analysis Chat
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 truncate">
-              Ask questions about your dreams and discover patterns
-            </p>
-          </div>
-        </div>
-      </div>
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-6">
@@ -291,7 +275,7 @@ export function ChatInterface() {
       )}
 
       {/* Input */}
-      <div className="border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-3 sm:p-4 safe-area-inset-bottom">
+      <div className="border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 sm:px-4 py-4 sm:py-6 safe-area-inset-bottom">
         <div className="flex gap-2 sm:gap-3">
           <textarea
             ref={inputRef}
