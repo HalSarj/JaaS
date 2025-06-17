@@ -7,7 +7,7 @@ import DreamsList from '@/components/dreams-list'
 import { DreamTimeline } from '@/components/dream-timeline'
 
 export default function DreamsPage() {
-  const [viewMode, setViewMode] = useState<'list' | 'timeline'>('list')
+  const [viewMode, setViewMode] = useState<'list' | 'timeline'>('timeline')
 
   return (
     <AppLayout>
