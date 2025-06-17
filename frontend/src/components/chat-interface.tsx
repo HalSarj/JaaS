@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Send, Loader2, Brain } from 'lucide-react'
+import { Send, Loader2, Brain, ChevronDown } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { apiClient } from '@/lib/api'
@@ -22,6 +22,7 @@ export function ChatInterface() {
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [dreamReferences, setDreamReferences] = useState<DreamReference[]>([])
+  const [isReferencesExpanded, setIsReferencesExpanded] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
@@ -242,30 +243,48 @@ export function ChatInterface() {
 
       {/* Dream References */}
       {dreamReferences.length > 0 && (
-        <div className="border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-3 sm:p-4 min-w-0">
-          <div className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-            Referenced Dreams ({dreamReferences.length})
-          </div>
-          <div className="w-full overflow-hidden">
-            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600 -mx-1 px-1">
-              {dreamReferences.map((dream) => (
-                <div
-                  key={dream.id}
-                  className="flex-shrink-0 bg-slate-50 dark:bg-slate-700 rounded-lg p-3 w-[160px] sm:w-[180px] border border-slate-200 dark:border-slate-600"
-                >
-                  <div className="text-xs text-slate-500 dark:text-slate-400 mb-1 truncate">
-                    {formatRelativeTime(dream.created_at)}
-                  </div>
-                  <div className="text-sm text-slate-700 dark:text-slate-300 line-clamp-2 break-words">
-                    {dream.transcript?.substring(0, 70)}...
-                  </div>
-                  <div className="text-xs text-purple-600 dark:text-purple-400 mt-1">
-                    {Math.round(dream.similarity_score * 100)}% match
-                  </div>
-                </div>
-              ))}
+        <div className="border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+          {/* Collapsible Header */}
+          <button
+            onClick={() => setIsReferencesExpanded(!isReferencesExpanded)}
+            className="w-full flex items-center justify-between p-3 sm:p-4 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors text-left"
+          >
+            <div className="text-sm font-medium text-slate-700 dark:text-slate-300">
+              Referenced Dreams ({dreamReferences.length})
             </div>
-          </div>
+            <ChevronDown 
+              className={cn(
+                "w-4 h-4 text-slate-400 transition-transform duration-200",
+                isReferencesExpanded ? "rotate-180" : "rotate-0"
+              )}
+            />
+          </button>
+          
+          {/* Expandable Content */}
+          {isReferencesExpanded && (
+            <div className="px-3 sm:px-4 pb-3 sm:pb-4">
+              <div className="overflow-x-auto">
+                <div className="flex gap-2 pb-2 min-w-max">
+                  {dreamReferences.map((dream) => (
+                    <div
+                      key={dream.id}
+                      className="flex-shrink-0 bg-slate-50 dark:bg-slate-700 rounded-lg p-3 w-[160px] sm:w-[180px] border border-slate-200 dark:border-slate-600"
+                    >
+                      <div className="text-xs text-slate-500 dark:text-slate-400 mb-1 truncate">
+                        {formatRelativeTime(dream.created_at)}
+                      </div>
+                      <div className="text-sm text-slate-700 dark:text-slate-300 line-clamp-2 break-words overflow-hidden">
+                        {dream.transcript?.substring(0, 70)}...
+                      </div>
+                      <div className="text-xs text-purple-600 dark:text-purple-400 mt-1">
+                        {Math.round(dream.similarity_score * 100)}% match
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
