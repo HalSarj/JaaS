@@ -2,7 +2,7 @@
 
 import { Fragment, useState } from 'react'
 import { Dialog, Transition, Tab } from '@headlessui/react'
-import { X, Calendar, MessageSquare, Brain, Heart, Eye, BookOpen, Lightbulb, TrendingUp, Star, Download, Share2 } from 'lucide-react'
+import { X, Calendar, MessageSquare, Brain, Heart, Eye, BookOpen, Lightbulb, TrendingUp, Star, Download, Share2, Sun, Moon, BarChart3, Target, HelpCircle } from 'lucide-react'
 import { Dream } from '@/types/chat'
 import { formatRelativeTime, cn } from '@/lib/utils'
 
@@ -84,9 +84,449 @@ export function DreamDetailModal({ dream, isOpen, onClose, onChatWithDream }: Dr
     }
   }
 
+  // Specialized formatting functions
+  const formatSentimentAnalysis = (sentiment: any) => {
+    if (!sentiment) return null;
+    
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* Overall Sentiment */}
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-4 rounded-lg">
+          <h4 className="font-medium text-blue-700 dark:text-blue-300 mb-2">Overall Sentiment</h4>
+          <div className="flex items-center gap-2">
+            <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+              <div 
+                className={`h-2 rounded-full ${sentiment.overall >= 0 ? 'bg-green-500' : 'bg-red-500'}`}
+                style={{ width: `${Math.abs(sentiment.overall) * 100}%` }}
+              />
+            </div>
+            <span className="text-sm font-mono">
+              {sentiment.overall > 0 ? '+' : ''}{(sentiment.overall * 100).toFixed(0)}%
+            </span>
+          </div>
+        </div>
+
+        {/* Emotional Intensity */}
+        <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 p-4 rounded-lg">
+          <h4 className="font-medium text-purple-700 dark:text-purple-300 mb-2">Emotional Intensity</h4>
+          <div className="flex items-center gap-2">
+            <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+              <div 
+                className="h-2 rounded-full bg-gradient-to-r from-purple-400 to-pink-500"
+                style={{ width: `${(sentiment.emotional_intensity || 0) * 100}%` }}
+              />
+            </div>
+            <span className="text-sm font-mono">
+              {((sentiment.emotional_intensity || 0) * 100).toFixed(0)}%
+            </span>
+          </div>
+        </div>
+
+        {/* Progression Timeline */}
+        {sentiment.progression && sentiment.progression.length > 1 && (
+          <div className="col-span-full bg-slate-50 dark:bg-slate-800 p-4 rounded-lg">
+            <h4 className="font-medium text-slate-700 dark:text-slate-300 mb-3">Emotional Journey</h4>
+            <div className="flex items-end gap-1 h-16">
+              {sentiment.progression.map((value: number, index: number) => (
+                <div key={index} className="flex-1 flex flex-col items-center">
+                  <div 
+                    className={`w-full rounded-t transition-all duration-300 ${value >= 0 ? 'bg-green-400' : 'bg-red-400'}`}
+                    style={{ 
+                      height: `${Math.max(Math.abs(value) * 100, 10)}%`,
+                      minHeight: '4px'
+                    }}
+                  />
+                  <span className="text-xs text-slate-500 mt-1">{index + 1}</span>
+                </div>
+              ))}
+            </div>
+            <div className="flex justify-between text-xs text-slate-500 mt-2">
+              <span>Beginning</span>
+              <span>End</span>
+            </div>
+          </div>
+        )}
+
+        {/* Polarity Shifts */}
+        {sentiment.polarity_shifts > 0 && (
+          <div className="col-span-full flex items-center gap-2 p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
+            <TrendingUp className="w-4 h-4 text-amber-600" />
+            <span className="text-sm text-amber-700 dark:text-amber-300">
+              {sentiment.polarity_shifts} emotional shift{sentiment.polarity_shifts !== 1 ? 's' : ''} detected
+            </span>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const formatJungianAnalysis = (jungian: any) => {
+    if (!jungian) return null;
+
+    return (
+      <div className="space-y-4">
+        {/* Archetypes */}
+        {jungian.archetypes && jungian.archetypes.length > 0 && (
+          <div>
+            <h4 className="font-medium text-slate-900 dark:text-slate-100 mb-3 flex items-center gap-2">
+              <BarChart3 className="w-4 h-4" />
+              Archetypal Presences
+            </h4>
+            <div className="grid gap-3">
+              {jungian.archetypes.map((archetype: any, index: number) => (
+                <div key={index} className="border border-slate-200 dark:border-slate-700 rounded-lg p-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <h5 className="font-medium text-slate-800 dark:text-slate-200">{archetype.archetype}</h5>
+                    <div className="flex items-center gap-2">
+                      <div className="w-16 bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+                        <div 
+                          className="h-1.5 rounded-full bg-gradient-to-r from-purple-400 to-blue-500"
+                          style={{ width: `${(archetype.strength || 0) * 100}%` }}
+                        />
+                      </div>
+                      <span className="text-xs text-slate-500 font-mono">
+                        {((archetype.strength || 0) * 100).toFixed(0)}%
+                      </span>
+                    </div>
+                  </div>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">
+                    <strong>Manifestation:</strong> {archetype.manifestation}
+                  </p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    {archetype.interpretation}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Persona vs Shadow */}
+        {jungian.persona_vs_shadow && (
+          <div>
+            <h4 className="font-medium text-slate-900 dark:text-slate-100 mb-3">Persona vs Shadow</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 p-4 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                <h5 className="font-medium text-yellow-800 dark:text-yellow-200 mb-2 flex items-center gap-2">
+                  <Sun className="w-4 h-4" />
+                  Persona Elements
+                </h5>
+                <div className="space-y-1">
+                  {jungian.persona_vs_shadow.persona_elements?.map((element: string, index: number) => (
+                    <div key={index} className="text-sm text-yellow-700 dark:text-yellow-300">• {element}</div>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="bg-gradient-to-br from-slate-50 to-gray-50 dark:from-slate-900/50 dark:to-gray-900/50 p-4 rounded-lg border border-slate-300 dark:border-slate-700">
+                <h5 className="font-medium text-slate-800 dark:text-slate-200 mb-2 flex items-center gap-2">
+                  <Moon className="w-4 h-4" />
+                  Shadow Elements
+                </h5>
+                <div className="space-y-1">
+                  {jungian.persona_vs_shadow.shadow_elements?.map((element: string, index: number) => (
+                    <div key={index} className="text-sm text-slate-700 dark:text-slate-300">• {element}</div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            
+            {/* Integration Opportunities */}
+            {jungian.persona_vs_shadow.integration_opportunities && jungian.persona_vs_shadow.integration_opportunities.length > 0 && (
+              <div className="mt-3 p-3 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                <h5 className="font-medium text-green-800 dark:text-green-200 mb-2 flex items-center gap-2">
+                  <Target className="w-4 h-4" />
+                  Integration Opportunities
+                </h5>
+                <div className="space-y-1">
+                  {jungian.persona_vs_shadow.integration_opportunities.map((opportunity: string, index: number) => (
+                    <div key={index} className="text-sm text-green-700 dark:text-green-300">• {opportunity}</div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Collective Symbols */}
+        {jungian.collective_symbols && jungian.collective_symbols.length > 0 && (
+          <div>
+            <h4 className="font-medium text-slate-900 dark:text-slate-100 mb-3">Collective Symbols</h4>
+            <div className="grid gap-2">
+              {jungian.collective_symbols.map((symbol: any, index: number) => (
+                <div key={index} className="flex items-start gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                  <div className="flex-shrink-0 w-2 h-2 rounded-full bg-blue-500 mt-2"></div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h5 className="font-medium text-blue-800 dark:text-blue-200">{symbol.symbol}</h5>
+                      <span className="text-xs bg-blue-200 dark:bg-blue-800 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded-full">
+                        {((symbol.confidence || 0) * 100).toFixed(0)}% confidence
+                      </span>
+                    </div>
+                    <p className="text-sm text-blue-700 dark:text-blue-300 mb-1">{symbol.interpretation}</p>
+                    <p className="text-xs text-blue-600 dark:text-blue-400 italic">{symbol.cultural_context}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const formatSymbolAnalysis = (symbols: any[]) => {
+    if (!symbols || !Array.isArray(symbols)) return null;
+
+    return (
+      <div className="grid gap-4">
+        {symbols.map((symbol, index) => {
+          const confidence = symbol.confidence || 0;
+          const emotionalCharge = symbol.emotional_charge || 0;
+          
+          return (
+            <div key={index} className="border border-slate-200 dark:border-slate-700 rounded-lg p-4 hover:shadow-md transition-shadow">
+              <div className="flex items-start justify-between mb-3">
+                <h4 className="font-semibold text-slate-900 dark:text-slate-100 text-lg">{symbol.item}</h4>
+                <div className="flex items-center gap-2">
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    confidence >= 0.8 ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' :
+                    confidence >= 0.6 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' :
+                    'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+                  }`}>
+                    {(confidence * 100).toFixed(0)}% confidence
+                  </span>
+                  <div className={`w-3 h-3 rounded-full ${
+                    emotionalCharge > 0.2 ? 'bg-green-500' :
+                    emotionalCharge < -0.2 ? 'bg-red-500' :
+                    'bg-gray-400'
+                  }`} title={`Emotional charge: ${emotionalCharge.toFixed(2)}`} />
+                </div>
+              </div>
+              
+              <p className="text-sm text-slate-600 dark:text-slate-400 mb-3 italic">"{symbol.context}"</p>
+              
+              <div className="mb-3">
+                <p className="text-sm text-slate-700 dark:text-slate-300 font-medium mb-1">Interpretation:</p>
+                <p className="text-sm text-slate-600 dark:text-slate-400">{symbol.interpretation}</p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {symbol.personal_associations && symbol.personal_associations.length > 0 && (
+                  <div>
+                    <p className="text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Personal Associations</p>
+                    <div className="flex flex-wrap gap-1">
+                      {symbol.personal_associations.map((assoc: string, i: number) => (
+                        <span key={i} className="px-2 py-0.5 bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300 rounded text-xs">
+                          {assoc}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {symbol.universal_meanings && symbol.universal_meanings.length > 0 && (
+                  <div>
+                    <p className="text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Universal Meanings</p>
+                    <div className="flex flex-wrap gap-1">
+                      {symbol.universal_meanings.map((meaning: string, i: number) => (
+                        <span key={i} className="px-2 py-0.5 bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 rounded text-xs">
+                          {meaning}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  const formatEmotionalAnalysis = (emotions: any) => {
+    if (!emotions) return null;
+
+    return (
+      <div className="space-y-4">
+        {/* Primary and Secondary Emotions */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {emotions.primary && emotions.primary.length > 0 && (
+            <div>
+              <h4 className="font-medium text-slate-900 dark:text-slate-100 mb-2">Primary Emotions</h4>
+              <div className="flex flex-wrap gap-2">
+                {emotions.primary.map((emotion: string, index: number) => (
+                  <span
+                    key={index}
+                    className="px-3 py-1 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 rounded-full text-sm font-medium"
+                  >
+                    {emotion}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {emotions.secondary && emotions.secondary.length > 0 && (
+            <div>
+              <h4 className="font-medium text-slate-900 dark:text-slate-100 mb-2">Secondary Emotions</h4>
+              <div className="flex flex-wrap gap-2">
+                {emotions.secondary.map((emotion: string, index: number) => (
+                  <span
+                    key={index}
+                    className="px-3 py-1 bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300 rounded-full text-sm font-medium"
+                  >
+                    {emotion}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Emotional Arc Timeline */}
+        {emotions.emotional_arc && (
+          <div>
+            <h4 className="font-medium text-slate-900 dark:text-slate-100 mb-3">Emotional Journey</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {['beginning', 'middle', 'end'].map((phase) => {
+                const phaseEmotions = emotions.emotional_arc[phase];
+                if (!phaseEmotions || phaseEmotions.length === 0) return null;
+                
+                return (
+                  <div key={phase} className="bg-slate-50 dark:bg-slate-800 p-3 rounded-lg">
+                    <h5 className="font-medium text-slate-700 dark:text-slate-300 mb-2 capitalize">{phase}</h5>
+                    <div className="space-y-1">
+                      {phaseEmotions.map((emotion: string, index: number) => (
+                        <div key={index} className="text-sm text-slate-600 dark:text-slate-400">• {emotion}</div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const formatQuestionsToExplore = (questions: string[]) => {
+    if (!questions || !Array.isArray(questions)) return null;
+
+    return (
+      <div className="grid gap-3">
+        {questions.map((question, index) => (
+          <div key={index} className="group border border-slate-200 dark:border-slate-700 rounded-lg p-4 hover:shadow-md transition-all duration-200 hover:border-blue-300 dark:hover:border-blue-600">
+            <div className="flex items-start gap-3">
+              <HelpCircle className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{question}</p>
+                {onChatWithDream && (
+                  <button
+                    onClick={() => {
+                      onChatWithDream(dream, question);
+                      onClose();
+                    }}
+                    className="mt-2 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    Explore this question →
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   const formatAnalysisSection = (title: string, data: unknown, icon: React.ReactNode) => {
     if (!data) return null
 
+    // Handle special cases with custom formatting
+    if (title === 'Sentiment' && typeof data === 'object') {
+      return (
+        <div className="mb-4 sm:mb-6">
+          <div className="flex items-center gap-2 mb-2 sm:mb-3">
+            {icon}
+            <h3 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-100">
+              {title}
+            </h3>
+          </div>
+          <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3 sm:p-4 border border-slate-200 dark:border-slate-700">
+            {formatSentimentAnalysis(data)}
+          </div>
+        </div>
+      )
+    }
+
+    if (title.includes('Jungian') && typeof data === 'object') {
+      return (
+        <div className="mb-4 sm:mb-6">
+          <div className="flex items-center gap-2 mb-2 sm:mb-3">
+            {icon}
+            <h3 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-100">
+              {title}
+            </h3>
+          </div>
+          <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3 sm:p-4 border border-slate-200 dark:border-slate-700">
+            {formatJungianAnalysis(data)}
+          </div>
+        </div>
+      )
+    }
+
+    if (title === 'Symbols' && Array.isArray(data)) {
+      return (
+        <div className="mb-4 sm:mb-6">
+          <div className="flex items-center gap-2 mb-2 sm:mb-3">
+            {icon}
+            <h3 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-100">
+              {title}
+            </h3>
+          </div>
+          <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3 sm:p-4 border border-slate-200 dark:border-slate-700">
+            {formatSymbolAnalysis(data)}
+          </div>
+        </div>
+      )
+    }
+
+    if (title === 'Emotions' && typeof data === 'object') {
+      return (
+        <div className="mb-4 sm:mb-6">
+          <div className="flex items-center gap-2 mb-2 sm:mb-3">
+            {icon}
+            <h3 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-100">
+              {title}
+            </h3>
+          </div>
+          <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3 sm:p-4 border border-slate-200 dark:border-slate-700">
+            {formatEmotionalAnalysis(data)}
+          </div>
+        </div>
+      )
+    }
+
+    if (title === 'Questions To Explore' && Array.isArray(data)) {
+      return (
+        <div className="mb-4 sm:mb-6">
+          <div className="flex items-center gap-2 mb-2 sm:mb-3">
+            {icon}
+            <h3 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-100">
+              {title}
+            </h3>
+          </div>
+          <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3 sm:p-4 border border-slate-200 dark:border-slate-700">
+            {formatQuestionsToExplore(data)}
+          </div>
+        </div>
+      )
+    }
+
+    // Default formatting for other sections
     return (
       <div className="mb-4 sm:mb-6">
         <div className="flex items-center gap-2 mb-2 sm:mb-3">
@@ -376,47 +816,10 @@ export function DreamDetailModal({ dream, isOpen, onClose, onChatWithDream }: Dr
                              )}
                              
                              {/* Emotions */}
-                             {dream.analysis.emotions && (
-                               <div className="mb-6">
-                                 <div className="flex items-center gap-2 mb-3">
-                                   <Heart className="w-5 h-5 text-red-500" />
-                                   <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-                                     Emotions
-                                   </h3>
-                                 </div>
-                                 <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3 sm:p-4 space-y-3 border border-slate-200 dark:border-slate-700">
-                                   {dream.analysis.emotions.primary && (
-                                     <div>
-                                       <h4 className="font-medium text-slate-900 dark:text-slate-100 mb-2 text-sm sm:text-base">Primary</h4>
-                                       <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                                         {dream.analysis.emotions.primary.map((emotion: string, index: number) => (
-                                           <span
-                                             key={index}
-                                             className="px-2 sm:px-3 py-1 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 rounded-full text-xs sm:text-sm font-medium"
-                                           >
-                                             {emotion}
-                                           </span>
-                                         ))}
-                                       </div>
-                                     </div>
-                                   )}
-                                   {dream.analysis.emotions.secondary && (
-                                     <div>
-                                       <h4 className="font-medium text-slate-900 dark:text-slate-100 mb-2 text-sm sm:text-base">Secondary</h4>
-                                       <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                                         {dream.analysis.emotions.secondary.map((emotion: string, index: number) => (
-                                           <span
-                                             key={index}
-                                             className="px-2 sm:px-3 py-1 bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300 rounded-full text-xs sm:text-sm font-medium"
-                                           >
-                                             {emotion}
-                                           </span>
-                                         ))}
-                                       </div>
-                                     </div>
-                                   )}
-                                 </div>
-                               </div>
+                             {formatAnalysisSection(
+                               'Emotions',
+                               dream.analysis.emotions,
+                               getAnalysisIcon('emotions')
                              )}
                              
                              {/* Symbols */}
