@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { List, Timeline } from 'lucide-react'
+import { List, BarChart3 } from 'lucide-react'
 import { AppLayout } from '@/components/app-layout'
 import DreamsList from '@/components/dreams-list'
 import { DreamTimeline } from '@/components/dream-timeline'
@@ -38,7 +38,7 @@ export default function DreamsPage() {
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
                 }`}
               >
-                <Timeline className="w-4 h-4" />
+                <BarChart3 className="w-4 h-4" />
                 <span className="hidden sm:inline">Timeline</span>
               </button>
             </div>

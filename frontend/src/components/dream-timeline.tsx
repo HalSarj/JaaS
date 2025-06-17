@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Calendar, Clock, Eye, Brain, TrendingUp, Circle } from 'lucide-react'
+import { useState, useEffect, useCallback } from 'react'
+import { Calendar, Eye, Brain, TrendingUp, Circle } from 'lucide-react'
 import { apiClient } from '@/lib/api'
 import { Dream, DreamAnalysis } from '@/types/chat'
 import { formatRelativeTime, cn } from '@/lib/utils'
@@ -32,26 +32,7 @@ export function DreamTimeline() {
     loadDreams()
   }, [])
 
-  useEffect(() => {
-    if (dreams.length > 0) {
-      groupDreamsByDate()
-      calculatePatterns()
-    }
-  }, [dreams, groupBy])
-
-  const loadDreams = async () => {
-    try {
-      setIsLoading(true)
-      const data = await apiClient.getDreams()
-      setDreams(data.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()))
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load dreams')
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const groupDreamsByDate = () => {
+  const groupDreamsByDate = useCallback(() => {
     const groups: { [key: string]: Dream[] } = {}
     
     dreams.forEach(dream => {
@@ -85,9 +66,9 @@ export function DreamTimeline() {
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 
     setTimelineGroups(timelineGroups)
-  }
+  }, [dreams, groupBy])
 
-  const calculatePatterns = () => {
+  const calculatePatterns = useCallback(() => {
     const patterns: PatternData = { themes: {}, emotions: {}, symbols: {} }
     
     dreams.forEach(dream => {
@@ -118,6 +99,25 @@ export function DreamTimeline() {
     })
     
     setPatternData(patterns)
+  }, [dreams])
+
+  useEffect(() => {
+    if (dreams.length > 0) {
+      groupDreamsByDate()
+      calculatePatterns()
+    }
+  }, [dreams, groupBy, groupDreamsByDate, calculatePatterns])
+
+  const loadDreams = async () => {
+    try {
+      setIsLoading(true)
+      const data = await apiClient.getDreams()
+      setDreams(data.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()))
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load dreams')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const getStatusColor = (status: Dream['status']) => {
@@ -288,7 +288,7 @@ export function DreamTimeline() {
           <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-slate-200 dark:bg-slate-700"></div>
           
           <div className="space-y-6 sm:space-y-8">
-            {timelineGroups.map((group, groupIndex) => (
+            {timelineGroups.map((group) => (
               <div key={group.date} className="relative">
                 {/* Date Marker */}
                 <div className="flex items-center mb-4">
@@ -302,7 +302,7 @@ export function DreamTimeline() {
                 
                 {/* Dreams in this group */}
                 <div className="ml-12 space-y-3">
-                  {group.dreams.map((dream, dreamIndex) => {
+                  {group.dreams.map((dream) => {
                     const mainTheme = getMainTheme(dream.analysis)
                     const themeColor = getThemeColor(mainTheme)
                     
