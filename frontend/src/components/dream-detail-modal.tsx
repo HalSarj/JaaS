@@ -30,29 +30,29 @@ export function DreamDetailModal({ dream, isOpen, onClose, onChatWithDream }: Dr
     if (!data) return null
 
     return (
-      <div className="mb-6">
-        <div className="flex items-center gap-2 mb-3">
+      <div className="mb-4 sm:mb-6">
+        <div className="flex items-center gap-2 mb-2 sm:mb-3">
           {icon}
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+          <h3 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-100">
             {title}
           </h3>
         </div>
-        <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4">
+        <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3 sm:p-4">
           {typeof data === 'string' ? (
-            <p className="text-slate-700 dark:text-slate-300">{data}</p>
+            <p className="text-sm sm:text-base text-slate-700 dark:text-slate-300">{data}</p>
           ) : Array.isArray(data) ? (
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5 sm:gap-2">
               {data.map((item, index) => (
                 <span
                   key={index}
-                  className="px-3 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 rounded-full text-sm"
+                  className="px-2 sm:px-3 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 rounded-full text-xs sm:text-sm"
                 >
                   {typeof item === 'string' ? item : item.item || item.name || String(item)}
                 </span>
               ))}
             </div>
           ) : (
-            <pre className="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap">
+            <pre className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap overflow-x-auto">
               {JSON.stringify(data, null, 2)}
             </pre>
           )}
@@ -77,7 +77,7 @@ export function DreamDetailModal({ dream, isOpen, onClose, onChatWithDream }: Dr
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4 text-center">
+          <div className="flex min-h-full items-end sm:items-center justify-center p-0 sm:p-4 text-center">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
@@ -87,40 +87,41 @@ export function DreamDetailModal({ dream, isOpen, onClose, onChatWithDream }: Dr
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-4xl transform overflow-hidden rounded-2xl bg-white dark:bg-slate-900 p-6 text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel className="w-full max-w-sm sm:max-w-2xl md:max-w-4xl transform overflow-hidden rounded-t-2xl sm:rounded-2xl bg-white dark:bg-slate-900 p-4 sm:p-6 text-left align-middle shadow-xl transition-all">
                 {/* Header */}
-                <div className="flex items-start justify-between mb-6">
-                  <div>
-                    <div className="flex items-center gap-3 mb-2">
-                      <Calendar className="w-5 h-5 text-slate-400" />
-                      <span className="text-slate-600 dark:text-slate-400">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-4 sm:mb-6 gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 sm:gap-3 mb-2 flex-wrap">
+                      <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-slate-400 flex-shrink-0" />
+                      <span className="text-sm sm:text-base text-slate-600 dark:text-slate-400 truncate">
                         {formatRelativeTime(dream.created_at)}
                       </span>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(dream.status)}`}>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(dream.status)} flex-shrink-0`}>
                         {dream.status}
                       </span>
                     </div>
                     <Dialog.Title
                       as="h2"
-                      className="text-2xl font-bold leading-6 text-slate-900 dark:text-slate-100"
+                      className="text-lg sm:text-xl md:text-2xl font-bold leading-tight text-slate-900 dark:text-slate-100"
                     >
                       Dream Details
                     </Dialog.Title>
                   </div>
                   
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-shrink-0">
                     {dream.status === 'complete' && onChatWithDream && (
                       <button
                         onClick={() => onChatWithDream(dream)}
-                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                        className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base min-h-[44px]"
                       >
-                        <MessageSquare className="w-4 h-4" />
-                        Ask about this dream
+                        <MessageSquare className="w-4 h-4 flex-shrink-0" />
+                        <span className="hidden sm:inline">Ask about this dream</span>
+                        <span className="sm:hidden">Ask</span>
                       </button>
                     )}
                     <button
                       onClick={onClose}
-                      className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                      className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
                     >
                       <X className="w-5 h-5" />
                     </button>
@@ -128,15 +129,15 @@ export function DreamDetailModal({ dream, isOpen, onClose, onChatWithDream }: Dr
                 </div>
 
                 {/* Content */}
-                <div className="space-y-6 max-h-[70vh] overflow-y-auto">
+                <div className="space-y-4 sm:space-y-6 max-h-[calc(100vh-200px)] sm:max-h-[70vh] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600">
                   {/* Transcript */}
                   {dream.transcript && (
                     <div>
-                      <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-3">
+                      <h3 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2 sm:mb-3">
                         Dream Transcript
                       </h3>
-                      <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4">
-                        <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
+                      <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3 sm:p-4">
+                        <p className="text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
                           {dream.transcript}
                         </p>
                       </div>
@@ -146,7 +147,7 @@ export function DreamDetailModal({ dream, isOpen, onClose, onChatWithDream }: Dr
                   {/* Analysis */}
                   {dream.analysis && dream.status === 'complete' && (
                     <div>
-                      <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6">
+                      <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 mb-4 sm:mb-6">
                         Dream Analysis
                       </h3>
                       
@@ -166,15 +167,15 @@ export function DreamDetailModal({ dream, isOpen, onClose, onChatWithDream }: Dr
                               Emotions
                             </h3>
                           </div>
-                          <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 space-y-3">
+                          <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3 sm:p-4 space-y-3">
                             {dream.analysis.emotions.primary && (
                               <div>
-                                <h4 className="font-medium text-slate-900 dark:text-slate-100 mb-2">Primary</h4>
-                                <div className="flex flex-wrap gap-2">
+                                <h4 className="font-medium text-slate-900 dark:text-slate-100 mb-2 text-sm sm:text-base">Primary</h4>
+                                <div className="flex flex-wrap gap-1.5 sm:gap-2">
                                   {dream.analysis.emotions.primary.map((emotion: string, index: number) => (
                                     <span
                                       key={index}
-                                      className="px-3 py-1 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 rounded-full text-sm"
+                                      className="px-2 sm:px-3 py-1 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 rounded-full text-xs sm:text-sm"
                                     >
                                       {emotion}
                                     </span>
@@ -184,12 +185,12 @@ export function DreamDetailModal({ dream, isOpen, onClose, onChatWithDream }: Dr
                             )}
                             {dream.analysis.emotions.secondary && (
                               <div>
-                                <h4 className="font-medium text-slate-900 dark:text-slate-100 mb-2">Secondary</h4>
-                                <div className="flex flex-wrap gap-2">
+                                <h4 className="font-medium text-slate-900 dark:text-slate-100 mb-2 text-sm sm:text-base">Secondary</h4>
+                                <div className="flex flex-wrap gap-1.5 sm:gap-2">
                                   {dream.analysis.emotions.secondary.map((emotion: string, index: number) => (
                                     <span
                                       key={index}
-                                      className="px-3 py-1 bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300 rounded-full text-sm"
+                                      className="px-2 sm:px-3 py-1 bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300 rounded-full text-xs sm:text-sm"
                                     >
                                       {emotion}
                                     </span>

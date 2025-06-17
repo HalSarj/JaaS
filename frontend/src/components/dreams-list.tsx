@@ -107,8 +107,8 @@ function DreamsList({ onDreamSelect }: DreamsListProps) {
   return (
     <div className="h-full flex flex-col bg-white dark:bg-slate-900">
       {/* Header */}
-      <div className="border-b border-slate-200 dark:border-slate-700 p-4">
-        <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4">
+      <div className="border-b border-slate-200 dark:border-slate-700 p-3 sm:p-4">
+        <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-100 mb-3 sm:mb-4">
           Your Dreams
         </h2>
         
@@ -120,7 +120,7 @@ function DreamsList({ onDreamSelect }: DreamsListProps) {
             placeholder="Search dreams..."
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-800 dark:text-slate-100"
+            className="w-full pl-10 pr-4 py-2.5 sm:py-2 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-800 dark:text-slate-100 text-base sm:text-sm min-h-[44px]"
           />
         </div>
       </div>
@@ -136,27 +136,27 @@ function DreamsList({ onDreamSelect }: DreamsListProps) {
             {searchQuery ? 'No dreams found matching your search.' : 'No dreams recorded yet.'}
           </div>
         ) : (
-          <div className="space-y-2 p-4">
+          <div className="space-y-2 sm:space-y-3 p-3 sm:p-4">
             {dreams.map((dream) => (
               <div
                 key={dream.id}
                 onClick={() => handleDreamClick(dream)}
-                className="p-4 border border-slate-200 dark:border-slate-700 rounded-lg hover:border-slate-300 dark:hover:border-slate-600 cursor-pointer transition-colors bg-white dark:bg-slate-800"
+                className="p-3 sm:p-4 border border-slate-200 dark:border-slate-700 rounded-lg hover:border-slate-300 dark:hover:border-slate-600 cursor-pointer transition-colors bg-white dark:bg-slate-800 active:bg-slate-50 dark:active:bg-slate-700"
               >
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-slate-400" />
-                    <span className="text-sm text-slate-600 dark:text-slate-400">
+                <div className="flex items-start justify-between mb-2 sm:mb-3">
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <Calendar className="w-4 h-4 text-slate-400 flex-shrink-0" />
+                    <span className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 truncate">
                       {formatRelativeTime(dream.created_at)}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(dream.status)}`}>
                       {dream.status}
                     </span>
                     <button
                       onClick={(e) => handleDeleteDream(dream.id, e)}
-                      className="p-1 text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                      className="p-2 text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center rounded-lg hover:bg-red-50 dark:hover:bg-red-950/20"
                       title="Delete dream"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -164,13 +164,14 @@ function DreamsList({ onDreamSelect }: DreamsListProps) {
                   </div>
                 </div>
 
-                <div className="mb-2">
-                  <div className="text-sm font-medium text-slate-900 dark:text-slate-100 mb-1">
+                <div className="mb-2 sm:mb-3">
+                  <div className="text-sm sm:text-base font-medium text-slate-900 dark:text-slate-100 mb-1 sm:mb-2">
                     {getMainTheme(dream.analysis)}
                   </div>
                   {dream.transcript && (
-                    <p className="text-sm text-slate-600 dark:text-slate-400">
-                      {truncateText(dream.transcript, 120)}
+                    <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                      <span className="sm:hidden">{truncateText(dream.transcript, 80)}</span>
+                      <span className="hidden sm:inline">{truncateText(dream.transcript, 120)}</span>
                     </p>
                   )}
                 </div>
@@ -181,10 +182,10 @@ function DreamsList({ onDreamSelect }: DreamsListProps) {
                       e.stopPropagation()
                       handleChatWithDream(dream)
                     }}
-                    className="flex items-center gap-2 text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                    className="flex items-center gap-2 text-xs sm:text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 py-1 px-2 -mx-2 rounded-md hover:bg-blue-50 dark:hover:bg-blue-950/20 transition-colors min-h-[36px]"
                   >
-                    <MessageSquare className="w-3 h-3" />
-                    Ask about this dream
+                    <MessageSquare className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span className="font-medium">Ask about this dream</span>
                   </button>
                 )}
               </div>
