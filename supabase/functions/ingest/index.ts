@@ -287,11 +287,11 @@ async function processNewAudioFile(userId: string, file: any, supabase: any, dro
       throw new Error(`Failed to upload audio: ${uploadError.message}`);
     }
 
-    // Create dream record
+    // Create dream record (using NULL user_id for frontend compatibility)
     const { data: dream, error: insertError } = await supabase
       .from('dreams')
       .insert({
-        user_id: userId,
+        user_id: null, // Use NULL for anonymous frontend access
         audio_path: fileName,
         dropbox_path: file.path_lower,
         dropbox_modified_time: file.server_modified,
