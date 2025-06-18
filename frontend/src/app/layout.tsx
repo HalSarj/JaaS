@@ -15,6 +15,15 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Dream Insight - JaaS",
   description: "Personal dream analysis tool powered by AI",
+  icons: {
+    icon: [
+      { url: "/JaaS Icon large.png", sizes: "any", type: "image/png" }
+    ],
+    apple: [
+      { url: "/JaaS Icon large.png", sizes: "180x180", type: "image/png" }
+    ],
+    shortcut: "/JaaS Icon large.png"
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
