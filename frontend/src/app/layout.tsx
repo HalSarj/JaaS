@@ -13,21 +13,22 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Dream Insight - JaaS",
+  title: "Jung as a Service",
   description: "Personal dream analysis tool powered by AI",
   icons: {
     icon: [
-      { url: "/JaaS Icon large.png", sizes: "any", type: "image/png" }
+      { url: "/favicon.png", sizes: "32x32", type: "image/png" },
+      { url: "/JaaS Icon large.png", sizes: "192x192", type: "image/png" }
     ],
     apple: [
       { url: "/JaaS Icon large.png", sizes: "180x180", type: "image/png" }
     ],
-    shortcut: "/JaaS Icon large.png"
+    shortcut: "/favicon.png"
   },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'Dream Insight',
+    title: 'Jung as a Service',
   },
 };
 
@@ -50,6 +51,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" href="/favicon.png" type="image/png" />
+        <link rel="shortcut icon" href="/favicon.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/JaaS Icon large.png" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
