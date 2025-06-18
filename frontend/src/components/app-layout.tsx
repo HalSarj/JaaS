@@ -49,7 +49,7 @@ function PasswordPrompt({ onCorrectPassword }: { onCorrectPassword: () => void }
         <div className="text-center mb-6 sm:mb-8">
           <Lock className="w-10 h-10 sm:w-12 sm:h-12 text-blue-600 mx-auto mb-4" />
           <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100">
-            Dream Insight
+            Jung as a Service
           </h1>
           <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 mt-2">
             Please enter the password to access your dream analysis
@@ -144,7 +144,7 @@ export function AppLayout({ children }: AppLayoutProps) {
       )}>
         <div className="flex items-center justify-between h-14 sm:h-16 px-4 border-b border-slate-200 dark:border-slate-700">
           <h1 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-100">
-            Dream Insight
+            Jung as a Service
           </h1>
           <button
             onClick={() => setSidebarOpen(false)}
@@ -203,7 +203,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             <Menu className="w-6 h-6" />
           </button>
           <h1 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-100 truncate">
-            Dream Insight
+            Jung as a Service
           </h1>
           <div className="w-10" /> {/* Spacer */}
         </div>
