@@ -217,21 +217,25 @@ serve(async (req) => {
     }
 
     // Step 2: Get user context for analysis
-    const { data: recentDreams } = await supabase
+    const { data: allDreams } = await supabase
       .from('dreams')
       .select('transcript, analysis, created_at')
       .eq('user_id', dream.user_id)
       .eq('status', 'complete')
       .neq('id', dream_id)
       .order('created_at', { ascending: false })
-      .limit(5);
+      .limit(10); // Get more dreams for relevance selection
 
-    const { data: recurringMotifs } = await supabase
+    const { data: allMotifs } = await supabase
       .from('recurring_motifs')
-      .select('motif, category, count, confidence_score')
+      .select('motif, category, count, confidence_score, last_seen')
       .eq('user_id', dream.user_id)
       .order('count', { ascending: false })
-      .limit(20);
+      .limit(30); // Get more motifs for filtering
+
+    // Apply smart context selection
+    const recentDreams = selectRelevantDreams(transcript, allDreams || []);
+    const recurringMotifs = filterActiveMotifs(allMotifs || []);
 
     // Step 3: Analyze with Claude Sonnet 4
     try {
@@ -368,16 +372,103 @@ serve(async (req) => {
   }
 });
 
+function selectRelevantDreams(transcript: string, allDreams: any[]): any[] {
+  if (!allDreams || allDreams.length === 0) return [];
+
+  // Score each dream for relevance
+  const scoredDreams = allDreams.map(dream => {
+    const relevanceScore = scoreContextRelevance(transcript, dream);
+    return { ...dream, relevanceScore };
+  });
+  
+  // Sort by relevance and take top 3
+  return scoredDreams
+    .sort((a, b) => b.relevanceScore - a.relevanceScore)
+    .slice(0, 3);
+}
+
+function scoreContextRelevance(newTranscript: string, pastDream: any): number {
+  if (!pastDream.analysis) return 0;
+  
+  const newKeywords = extractKeywords(newTranscript);
+  const pastThemes = pastDream.analysis.themes || [];
+  const pastEmotions = pastDream.analysis.emotions?.primary || [];
+  
+  // Calculate shared themes (40%)
+  const sharedThemes = intersection(newKeywords, pastThemes).length;
+  const themeScore = sharedThemes / Math.max(newKeywords.length, pastThemes.length, 1);
+  
+  // Calculate shared emotions (40%)
+  const newEmotions = extractEmotionalWords(newTranscript);
+  const sharedEmotions = intersection(newEmotions, pastEmotions).length;
+  const emotionScore = sharedEmotions / Math.max(newEmotions.length, pastEmotions.length, 1);
+  
+  // Calculate recency bonus (20%)
+  const daysSince = Math.floor((Date.now() - new Date(pastDream.created_at).getTime()) / (1000 * 60 * 60 * 24));
+  const recencyScore = Math.max(0, (30 - daysSince) / 30);
+  
+  return (themeScore * 0.4) + (emotionScore * 0.4) + (recencyScore * 0.2);
+}
+
+function extractKeywords(text: string): string[] {
+  const keywords: string[] = [];
+  const lowerText = text.toLowerCase();
+  
+  // Common dream themes
+  const themes = ['water', 'house', 'car', 'family', 'work', 'school', 'death', 'flying', 'falling', 'chase', 'lost', 'door', 'stairs', 'animal', 'baby', 'wedding', 'fire', 'money', 'phone', 'mirror'];
+  themes.forEach(theme => {
+    if (lowerText.includes(theme)) keywords.push(theme);
+  });
+  
+  return keywords;
+}
+
+function extractEmotionalWords(text: string): string[] {
+  const emotions: string[] = [];
+  const lowerText = text.toLowerCase();
+  
+  // Common emotional words
+  const emotionalTerms = ['scared', 'afraid', 'happy', 'sad', 'angry', 'excited', 'worried', 'calm', 'anxious', 'peaceful', 'frustrated', 'joy', 'fear', 'love', 'hate', 'confused', 'confident', 'nervous', 'relaxed'];
+  emotionalTerms.forEach(term => {
+    if (lowerText.includes(term)) emotions.push(term);
+  });
+  
+  return emotions;
+}
+
+function intersection(arr1: string[], arr2: string[]): string[] {
+  return arr1.filter(item => arr2.includes(item));
+}
+
+function filterActiveMotifs(allMotifs: any[]): any[] {
+  if (!allMotifs || allMotifs.length === 0) return [];
+  
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  
+  return allMotifs
+    .filter(motif => {
+      // Include recent motifs (count >= 1) and established patterns (count >= 2)
+      const lastSeen = new Date(motif.last_seen);
+      return lastSeen > thirtyDaysAgo && motif.count >= 1;
+    })
+    .slice(0, 8); // Limit to top 8 active motifs
+}
+
 function buildAnalysisPrompt(transcript: string, recentDreams: any[], recurringMotifs: any[]): string {
+  // Compress context using hierarchical summaries
   const contextSection = recentDreams.length > 0 
-    ? `\n\nRECENT DREAMS CONTEXT:\n${recentDreams.map((d, i) => 
-        `${i + 1}. ${d.transcript?.substring(0, 200)}...`
-      ).join('\n')}`
+    ? `\n\nRELEVANT DREAM PATTERNS:\n${recentDreams.map((d, i) => {
+        const themes = d.analysis?.themes?.slice(0, 3).join(', ') || 'no themes';
+        const primaryEmotion = d.analysis?.emotions?.primary?.[0] || 'neutral';
+        const daysAgo = Math.floor((Date.now() - new Date(d.created_at).getTime()) / (1000 * 60 * 60 * 24));
+        return `${i + 1}. ${themes} (${primaryEmotion}, ${daysAgo}d ago)`;
+      }).join('\n')}`
     : '';
 
   const motifsSection = recurringMotifs.length > 0
-    ? `\n\nKNOWN RECURRING MOTIFS:\n${recurringMotifs.map(m => 
-        `- ${m.motif} (${m.category || 'uncategorized'}, appeared ${m.count} times)`
+    ? `\n\nACTIVE RECURRING MOTIFS:\n${recurringMotifs.map(m => 
+        `- ${m.motif} (${m.category || 'symbol'}, ${m.count}x)`
       ).join('\n')}`
     : '';
 
