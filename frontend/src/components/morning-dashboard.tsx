@@ -40,6 +40,15 @@ export function MorningDashboard({ className }: MorningDashboardProps) {
     try {
       const data = await apiClient.getDashboardInsights(isRefresh)
       setInsights(data)
+      
+      // Cache insights in localStorage with timestamp
+      if (data) {
+        localStorage.setItem('dashboard_insights', JSON.stringify({
+          data,
+          cached_at: new Date().toISOString(),
+          generated_at: data.generated_at
+        }))
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load insights')
     } finally {
@@ -48,8 +57,58 @@ export function MorningDashboard({ className }: MorningDashboardProps) {
     }
   }
 
+  const loadInsights = async () => {
+    setLoading(true)
+    setError(null)
+
+    try {
+      // Check for cached insights first
+      const cached = localStorage.getItem('dashboard_insights')
+      if (cached) {
+        const { data: cachedData, cached_at } = JSON.parse(cached)
+        const cacheDate = new Date(cached_at)
+        const today = new Date()
+        
+        // If cached insights are from today, use them initially
+        if (cacheDate.toDateString() === today.toDateString()) {
+          setInsights(cachedData)
+          setLoading(false)
+          
+          // Check if there are newer dreams that would require refresh
+          await checkForNewerDreams(cachedData.generated_at)
+          return
+        }
+      }
+      
+      // No valid cache, fetch fresh insights
+      await fetchInsights(false)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load insights')
+      setLoading(false)
+    }
+  }
+
+  const checkForNewerDreams = async (lastGeneratedAt: string) => {
+    try {
+      const dreams = await apiClient.getDreams()
+      const newerDreams = dreams.filter(dream => 
+        dream.status === 'complete' && 
+        new Date(dream.created_at) > new Date(lastGeneratedAt)
+      )
+      
+      // If there are newer completed dreams, refresh insights automatically
+      if (newerDreams.length > 0) {
+        console.log(`Found ${newerDreams.length} new dreams, refreshing insights`)
+        await fetchInsights(true)
+      }
+    } catch (err) {
+      console.error('Failed to check for newer dreams:', err)
+      // Silently fail - user can still manually refresh
+    }
+  }
+
   useEffect(() => {
-    fetchInsights()
+    loadInsights()
   }, [])
 
   const handleRefresh = () => {
