@@ -110,12 +110,11 @@ Deno.serve(async (req) => {
       });
 
       if (signature !== expectedHex) {
-        console.error('Invalid signature - but proceeding for now');
-        // For production, uncomment this:
-        // return new Response('Invalid signature', { 
-        //   status: 403, 
-        //   headers: corsHeaders 
-        // });
+        console.error('Invalid signature');
+        return new Response('Invalid signature', { 
+          status: 403, 
+          headers: corsHeaders 
+        });
       }
 
       console.log('Webhook signature verified');
