@@ -141,7 +141,7 @@ export class ApiClient {
       duration_minutes: number;
     };
     integration_bridge: string;
-    reflection_prompt: string;
+    shadow_analysis: string;
     context_thread: string;
     generated_at: string;
     dreams_analyzed: number;

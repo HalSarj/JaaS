@@ -19,7 +19,7 @@ interface DashboardInsights {
     duration_minutes: number;
   };
   integration_bridge: string;
-  reflection_prompt: string;
+  shadow_analysis: string;
   context_thread: string;
   generated_at: string;
   dreams_analyzed: number;
@@ -230,7 +230,7 @@ Create insights in this exact JSON format:
     "duration_minutes": 5
   },
   "integration_bridge": "How to apply the dream wisdom to daily interactions and decisions today. Be specific about real-life application.",
-  "reflection_prompt": "One thoughtful question that bridges the dream patterns to daily life application.",
+  "shadow_analysis": "Uncompromising analysis of negative traits, repressed aspects, or shadow elements revealed in these dreams. Be direct and honest about what the unconscious is showing about character flaws, blind spots, or avoided truths.",
   "context_thread": "A brief note on how these recent patterns might relate to longer-term psychological development or growth themes."
 }
 
@@ -239,6 +239,7 @@ Guidelines:
 - Make the "today_practice" genuinely doable and specific
 - Choose "immediate" (5-10 mins) for most practices, only use "deeper" (20-30 mins) and increase duration_minutes if the patterns suggest significant integration work is needed
 - Focus on Jungian principles applied practically
-- Be encouraging but realistic
+- Be encouraging but realistic in most sections
+- For "shadow_analysis": Be brutally honest and direct - no sugar-coating or gentle language. Call out psychological patterns, defense mechanisms, and negative traits clearly
 - No generic advice - make it specific to these dream patterns`);
 }
