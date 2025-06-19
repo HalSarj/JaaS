@@ -473,130 +473,55 @@ function buildAnalysisPrompt(transcript: string, recentDreams: any[], recurringM
       ).join('\n')}`
     : '';
 
-  return `Please analyze this dream transcript using both Jungian psychology and cognitive neuroscience frameworks.
+  return `Analyze this dream using Jungian psychology and cognitive neuroscience. Provide comprehensive analysis in this JSON format:
 
-DREAM TRANSCRIPT:
-"${transcript}"
+DREAM: "${transcript}"
 ${contextSection}
 ${motifsSection}
 
-Provide a comprehensive analysis in the following JSON format:
-
 {
-  "sentiment": {
-    "overall": -1.0, // -1 to 1
-    "progression": [0.2, -0.1, 0.8], // sentiment changes throughout dream
-    "emotional_intensity": 0.7,
-    "polarity_shifts": 2
-  },
+  "sentiment": {"overall": -1.0, "progression": [0.2, -0.1], "emotional_intensity": 0.7, "polarity_shifts": 2},
   "emotions": {
-    "primary": ["anxiety", "curiosity"],
-    "secondary": ["nostalgia", "hope"],
-    "emotional_arc": {
-      "beginning": ["anxiety"],
-      "middle": ["curiosity", "excitement"], 
-      "end": ["relief", "hope"]
-    },
-    "unresolved_emotions": ["underlying fear"]
+    "primary": ["anxiety"], "secondary": ["hope"], 
+    "emotional_arc": {"beginning": ["anxiety"], "middle": ["curiosity"], "end": ["relief"]},
+    "unresolved_emotions": ["fear"]
   },
   "jungian_analysis": {
-    "archetypes": [
-      {
-        "archetype": "The Shadow",
-        "manifestation": "the pursuing figure",
-        "strength": 0.8,
-        "interpretation": "represents repressed aspects of self"
-      }
-    ],
-    "individuation_themes": ["integration of opposites", "confronting the unknown"],
-    "collective_symbols": [
-      {
-        "symbol": "water",
-        "interpretation": "unconscious, emotions, purification",
-        "confidence": 0.9,
-        "cultural_context": "universal symbol of life and transformation"
-      }
-    ],
-    "shadow_elements": ["fear of judgment", "hidden desires"],
-    "anima_animus_presence": {
-      "present": true,
-      "manifestation": "the wise woman figure",
-      "interpretation": "connection to inner wisdom"
-    },
+    "archetypes": [{"archetype": "Shadow", "manifestation": "pursuing figure", "strength": 0.8, "interpretation": "repressed aspects"}],
+    "individuation_themes": ["integration", "confronting unknown"],
+    "collective_symbols": [{"symbol": "water", "interpretation": "unconscious emotions", "confidence": 0.9, "cultural_context": "universal transformation symbol"}],
+    "shadow_elements": ["fear", "hidden desires"],
+    "anima_animus_presence": {"present": true, "manifestation": "wise figure", "interpretation": "inner wisdom"},
     "persona_vs_shadow": {
-      "persona_elements": ["trying to appear composed"],
-      "shadow_elements": ["panic and vulnerability"],
-      "integration_opportunities": ["accepting vulnerability as strength"]
+      "persona_elements": ["composed appearance"], 
+      "shadow_elements": ["vulnerability"],
+      "integration_opportunities": ["accepting weakness as strength"]
     }
   },
   "cognitive_analysis": {
-    "threat_simulation": {
-      "present": true,
-      "type": "social rejection",
-      "adaptive_value": "rehearsing coping mechanisms"
-    },
-    "memory_consolidation": {
-      "episodic_memories": ["recent job interview"],
-      "procedural_learning": ["problem-solving under pressure"],
-      "emotional_processing": ["processing anxiety about performance"]
-    },
-    "emotional_regulation": {
-      "coping_mechanisms": ["seeking help", "strategic retreat"],
-      "unresolved_conflicts": ["self-worth vs. external validation"],
-      "integration_attempts": ["finding balance between confidence and humility"]
-    },
-    "problem_solving": {
-      "creative_solutions": ["thinking outside conventional approaches"],
-      "rehearsal_scenarios": ["handling difficult social situations"],
-      "alternative_perspectives": ["seeing challenges as opportunities"]
-    }
+    "threat_simulation": {"present": true, "type": "social rejection", "adaptive_value": "rehearsing coping"},
+    "memory_consolidation": {"episodic_memories": ["recent events"], "procedural_learning": ["problem-solving"], "emotional_processing": ["anxiety processing"]},
+    "emotional_regulation": {"coping_mechanisms": ["seeking help"], "unresolved_conflicts": ["self-worth"], "integration_attempts": ["finding balance"]},
+    "problem_solving": {"creative_solutions": ["novel approaches"], "rehearsal_scenarios": ["social situations"], "alternative_perspectives": ["reframing challenges"]}
   },
-  "symbols": [
-    {
-      "item": "door",
-      "context": "locked door blocking path",
-      "personal_associations": ["barriers", "opportunity"],
-      "universal_meanings": ["transition", "choice", "access"],
-      "interpretation": "represents current life obstacles and the need to find new approaches",
-      "confidence": 0.85,
-      "emotional_charge": -0.3
-    }
-  ],
-  "themes": ["overcoming obstacles", "self-discovery", "transformation"],
+  "symbols": [{
+    "item": "door", "context": "blocked path", 
+    "personal_associations": ["barriers"], "universal_meanings": ["transition"], 
+    "interpretation": "life obstacles requiring new approaches", "confidence": 0.85, "emotional_charge": -0.3
+  }],
+  "themes": ["obstacles", "self-discovery", "transformation"],
   "narrative_structure": {
-    "type": "linear",
-    "coherence_score": 0.8,
-    "resolution": "ambiguous",
-    "narrative_themes": ["journey", "challenge", "growth"],
-    "story_arc": {
-      "exposition": "finding oneself in an unfamiliar situation",
-      "rising_action": ["encountering obstacles", "attempting solutions"],
-      "climax": "moment of realization or breakthrough",
-      "resolution": "new understanding or unresolved tension"
-    }
+    "type": "linear", "coherence_score": 0.8, "resolution": "ambiguous",
+    "narrative_themes": ["journey"], 
+    "story_arc": {"exposition": "unfamiliar situation", "rising_action": ["obstacles"], "climax": "realization", "resolution": "new understanding"}
   },
-  "psychological_insights": "This dream appears to be processing anxiety about performance and acceptance, while also exploring themes of personal growth and authentic self-expression. The symbolic elements suggest a readiness for transformation but also apprehension about the unknown.",
-  "connections_to_previous": ["Similar themes of doors/barriers in previous dreams", "Recurring anxiety patterns around evaluation"],
-  "questions_to_explore": [
-    "What specific barriers feel most challenging in your waking life?",
-    "How might you integrate the wisdom shown in this dream?",
-    "What would it mean to embrace vulnerability as strength?"
-  ],
-  "processing_metadata": {
-    "analysis_version": "1.0",
-    "processing_time_ms": 2500,
-    "model_used": "${modelName}",
-    "confidence_score": 0.82,
-    "token_usage": {
-      "input_tokens": 1200,
-      "output_tokens": 800,
-      "total_cost_usd": 0.024
-    },
-    "analysis_depth": "comprehensive"
-  }
+  "psychological_insights": "Comprehensive interpretation connecting dream elements to psychological patterns and life themes.",
+  "connections_to_previous": ["Similar patterns from past dreams"],
+  "questions_to_explore": ["Key questions for deeper reflection", "Integration opportunities"],
+  "processing_metadata": {"analysis_version": "1.0", "model_used": "${modelName}", "confidence_score": 0.82, "analysis_depth": "comprehensive"}
 }
 
-Focus on providing actionable psychological insights while maintaining scientific rigor. Consider both the personal context and universal dream symbolism.`;
+Provide rich, detailed analysis maintaining full psychological depth and scientific rigor.`;
 }
 
 async function updateRecurringMotifs(supabase: any, userId: string, analysis: any) {
