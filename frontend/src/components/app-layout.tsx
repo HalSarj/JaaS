@@ -1,13 +1,14 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { MessageSquare, FileText, Menu, X, Lock } from 'lucide-react'
+import { MessageSquare, FileText, Menu, X, Lock, Home } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 
 const navigation = [
-  { name: 'Chat', href: '/', icon: MessageSquare },
+  { name: 'Dashboard', href: '/', icon: Home },
+  { name: 'Chat', href: '/chat', icon: MessageSquare },
   { name: 'Dreams', href: '/dreams', icon: FileText },
 ]
 

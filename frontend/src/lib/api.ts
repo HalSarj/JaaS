@@ -132,6 +132,33 @@ export class ApiClient {
 
     return data || []
   }
+
+  async getDashboardInsights(forceRefresh = false): Promise<any> {
+    if (!this.baseUrl) {
+      throw new Error('Supabase URL not configured')
+    }
+    
+    const userId = getCurrentUserId()
+    
+    const response = await fetch(`${this.baseUrl}/functions/v1/dashboard-insights`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        user_id: userId === 'null' ? null : userId,
+        force_refresh: forceRefresh
+      })
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.details || error.error || 'Failed to fetch dashboard insights')
+    }
+
+    return response.json()
+  }
 }
 
 export const apiClient = new ApiClient()
