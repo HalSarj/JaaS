@@ -817,7 +817,7 @@ export function DreamDetailModal({ dream, isOpen, onClose, onChatWithDream }: Dr
               <div className="absolute left-6 top-6 bottom-6 w-0.5 bg-gradient-to-b from-indigo-200 to-purple-200 dark:from-indigo-800 dark:to-purple-800"></div>
               
               <div className="space-y-4">
-                {storyPhases.map((phase, index) => (
+                {storyPhases.map((phase) => (
                   <div key={phase.key} className="relative flex items-start gap-4">
                     <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900 dark:to-purple-900 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-900 shadow-sm">
                       <div className="w-3 h-3 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full"></div>
