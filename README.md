@@ -167,6 +167,10 @@ npx supabase functions serve --env-file .env.local
 curl -X POST http://localhost:54321/functions/v1/ingest \
   -H "Authorization: Bearer your-anon-key" \
   -F "audio=@test-dream.m4a"
+
+# Install frontend dependencies and lint
+cd frontend && npm install
+npm run lint
 ```
 
 ### Database Schema
