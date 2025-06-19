@@ -239,7 +239,8 @@ serve(async (req) => {
 
     // Step 3: Analyze with Claude Sonnet 4
     try {
-      const analysisPrompt = buildAnalysisPrompt(transcript, recentDreams || [], recurringMotifs || []);
+      const modelName = 'anthropic/claude-sonnet-4';
+      const analysisPrompt = buildAnalysisPrompt(transcript, recentDreams || [], recurringMotifs || [], modelName);
       
       const analysisResponse = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
         method: 'POST',
@@ -248,7 +249,7 @@ serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'anthropic/claude-sonnet-4',
+          model: modelName,
           messages: [
             {
               role: 'system',
@@ -455,7 +456,7 @@ function filterActiveMotifs(allMotifs: any[]): any[] {
     .slice(0, 8); // Limit to top 8 active motifs
 }
 
-function buildAnalysisPrompt(transcript: string, recentDreams: any[], recurringMotifs: any[]): string {
+function buildAnalysisPrompt(transcript: string, recentDreams: any[], recurringMotifs: any[], modelName: string): string {
   // Compress context using hierarchical summaries
   const contextSection = recentDreams.length > 0 
     ? `\n\nRELEVANT DREAM PATTERNS:\n${recentDreams.map((d, i) => {
@@ -584,7 +585,7 @@ Provide a comprehensive analysis in the following JSON format:
   "processing_metadata": {
     "analysis_version": "1.0",
     "processing_time_ms": 2500,
-    "model_used": "claude-3.5-sonnet",
+    "model_used": "${modelName}",
     "confidence_score": 0.82,
     "token_usage": {
       "input_tokens": 1200,
