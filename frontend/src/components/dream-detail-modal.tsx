@@ -2,7 +2,7 @@
 
 import { Fragment, useState } from 'react'
 import { Dialog, Transition, Tab } from '@headlessui/react'
-import { X, Calendar, MessageSquare, Brain, Heart, Eye, BookOpen, Lightbulb, TrendingUp, Star, Download, Share2, Sun, Moon, BarChart3, Target, HelpCircle, Shield, Zap, Cog, Archive, AlertTriangle, CheckCircle2 } from 'lucide-react'
+import { X, Calendar, MessageSquare, Brain, Heart, Eye, BookOpen, Lightbulb, TrendingUp, Star, Download, Share2, Sun, Moon, BarChart3, Target, HelpCircle, Shield, Zap, Cog, Archive, AlertTriangle, CheckCircle2, Clock, DollarSign, Gauge, Play } from 'lucide-react'
 import { Dream } from '@/types/chat'
 import { formatRelativeTime, cn } from '@/lib/utils'
 
@@ -36,7 +36,8 @@ export function DreamDetailModal({ dream, isOpen, onClose, onChatWithDream }: Dr
       psychological_insights: <Lightbulb className="w-5 h-5 text-green-500" />,
       narrative_structure: <BookOpen className="w-5 h-5 text-indigo-500" />,
       archetypal_patterns: <Star className="w-5 h-5 text-yellow-500" />,
-      personal_connections: <TrendingUp className="w-5 h-5 text-orange-500" />
+      personal_connections: <TrendingUp className="w-5 h-5 text-orange-500" />,
+      processing_metadata: <Cog className="w-5 h-5 text-slate-500" />
     }
     return iconMap[key] || <Brain className="w-5 h-5 text-slate-500" />
   }
@@ -748,6 +749,248 @@ export function DreamDetailModal({ dream, isOpen, onClose, onChatWithDream }: Dr
     );
   };
 
+  const formatNarrativeStructure = (narrative: {
+    type?: string;
+    story_arc?: {
+      exposition?: string;
+      rising_action?: string[];
+      climax?: string;
+      resolution?: string;
+    };
+    resolution?: string;
+    coherence_score?: number;
+    narrative_themes?: string[];
+  }) => {
+    if (!narrative) return null;
+
+    const storyPhases = [
+      { key: 'exposition', label: 'Beginning', content: narrative.story_arc?.exposition },
+      { key: 'rising_action', label: 'Development', content: narrative.story_arc?.rising_action?.join(' • ') },
+      { key: 'climax', label: 'Climax', content: narrative.story_arc?.climax },
+      { key: 'resolution', label: 'Resolution', content: narrative.story_arc?.resolution }
+    ].filter(phase => phase.content);
+
+    return (
+      <div className="space-y-6">
+        {/* Narrative Type & Coherence */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+            <div className="flex items-center gap-2 mb-2">
+              <Play className="w-4 h-4 text-blue-600" />
+              <h4 className="font-medium text-blue-800 dark:text-blue-200">Narrative Type</h4>
+            </div>
+            <p className="text-sm text-blue-700 dark:text-blue-300 capitalize">
+              {narrative.type || 'Unknown'}
+            </p>
+          </div>
+
+          {narrative.coherence_score !== undefined && (
+            <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 p-4 rounded-lg border border-green-200 dark:border-green-800">
+              <div className="flex items-center gap-2 mb-2">
+                <Gauge className="w-4 h-4 text-green-600" />
+                <h4 className="font-medium text-green-800 dark:text-green-200">Story Coherence</h4>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                  <div 
+                    className="h-2 rounded-full bg-gradient-to-r from-green-400 to-emerald-500"
+                    style={{ width: `${(narrative.coherence_score * 100)}%` }}
+                  />
+                </div>
+                <span className="text-sm font-mono text-green-700 dark:text-green-300">
+                  {(narrative.coherence_score * 100).toFixed(0)}%
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Story Arc Timeline */}
+        {storyPhases.length > 0 && (
+          <div>
+            <h4 className="font-medium text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-indigo-500" />
+              Story Arc Timeline
+            </h4>
+            <div className="relative">
+              {/* Timeline line */}
+              <div className="absolute left-6 top-6 bottom-6 w-0.5 bg-gradient-to-b from-indigo-200 to-purple-200 dark:from-indigo-800 dark:to-purple-800"></div>
+              
+              <div className="space-y-4">
+                {storyPhases.map((phase, index) => (
+                  <div key={phase.key} className="relative flex items-start gap-4">
+                    <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900 dark:to-purple-900 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-900 shadow-sm">
+                      <div className="w-3 h-3 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full"></div>
+                    </div>
+                    <div className="flex-1 min-w-0 pb-4">
+                      <h5 className="font-medium text-slate-800 dark:text-slate-200 mb-1">
+                        {phase.label}
+                      </h5>
+                      <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                        {phase.content}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Narrative Themes */}
+        {narrative.narrative_themes && narrative.narrative_themes.length > 0 && (
+          <div>
+            <h4 className="font-medium text-slate-900 dark:text-slate-100 mb-3 flex items-center gap-2">
+              <Target className="w-4 h-4 text-purple-500" />
+              Narrative Themes
+            </h4>
+            <div className="flex flex-wrap gap-2">
+              {narrative.narrative_themes.map((theme, index) => (
+                <span
+                  key={index}
+                  className="px-3 py-1 bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300 rounded-full text-sm font-medium"
+                >
+                  {theme}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const formatProcessingMetadata = (metadata: {
+    model_used?: string;
+    token_usage?: {
+      input_tokens?: number;
+      output_tokens?: number;
+      total_cost_usd?: number;
+    };
+    analysis_depth?: string;
+    analysis_version?: string;
+    confidence_score?: number;
+    processing_time_ms?: number;
+  }) => {
+    if (!metadata) return null;
+
+    return (
+      <div className="space-y-4">
+        {/* Overview Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {metadata.model_used && (
+            <div className="bg-gradient-to-br from-slate-50 to-gray-50 dark:from-slate-900/50 dark:to-gray-900/50 p-4 rounded-lg border border-slate-200 dark:border-slate-700">
+              <div className="flex items-center gap-2 mb-2">
+                <Brain className="w-4 h-4 text-slate-600" />
+                <h4 className="font-medium text-slate-800 dark:text-slate-200">AI Model</h4>
+              </div>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                {metadata.model_used}
+              </p>
+            </div>
+          )}
+
+          {metadata.token_usage?.total_cost_usd !== undefined && (
+            <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 p-4 rounded-lg border border-green-200 dark:border-green-800">
+              <div className="flex items-center gap-2 mb-2">
+                <DollarSign className="w-4 h-4 text-green-600" />
+                <h4 className="font-medium text-green-800 dark:text-green-200">Analysis Cost</h4>
+              </div>
+              <p className="text-sm text-green-700 dark:text-green-300">
+                ${metadata.token_usage.total_cost_usd.toFixed(3)} USD
+              </p>
+            </div>
+          )}
+
+          {metadata.processing_time_ms && (
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+              <div className="flex items-center gap-2 mb-2">
+                <Clock className="w-4 h-4 text-blue-600" />
+                <h4 className="font-medium text-blue-800 dark:text-blue-200">Processing Time</h4>
+              </div>
+              <p className="text-sm text-blue-700 dark:text-blue-300">
+                {(metadata.processing_time_ms / 1000).toFixed(1)}s
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Detailed Metrics */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {metadata.token_usage && (
+            <div className="border border-slate-200 dark:border-slate-700 rounded-lg p-4">
+              <h4 className="font-medium text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-2">
+                <BarChart3 className="w-4 h-4 text-slate-600" />
+                Token Usage
+              </h4>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-slate-600 dark:text-slate-400">Input:</span>
+                  <span className="font-mono text-slate-800 dark:text-slate-200">
+                    {metadata.token_usage.input_tokens?.toLocaleString() || 'N/A'}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-slate-600 dark:text-slate-400">Output:</span>
+                  <span className="font-mono text-slate-800 dark:text-slate-200">
+                    {metadata.token_usage.output_tokens?.toLocaleString() || 'N/A'}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm font-medium pt-1 border-t border-slate-200 dark:border-slate-700">
+                  <span className="text-slate-700 dark:text-slate-300">Total:</span>
+                  <span className="font-mono text-slate-900 dark:text-slate-100">
+                    {((metadata.token_usage.input_tokens || 0) + (metadata.token_usage.output_tokens || 0)).toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="border border-slate-200 dark:border-slate-700 rounded-lg p-4">
+            <h4 className="font-medium text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-2">
+              <Star className="w-4 h-4 text-slate-600" />
+              Analysis Quality
+            </h4>
+            <div className="space-y-3">
+              {metadata.confidence_score !== undefined && (
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-slate-600 dark:text-slate-400">Confidence:</span>
+                    <span className="font-mono text-slate-800 dark:text-slate-200">
+                      {(metadata.confidence_score * 100).toFixed(0)}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+                    <div 
+                      className="h-1.5 rounded-full bg-gradient-to-r from-yellow-400 to-green-500"
+                      style={{ width: `${(metadata.confidence_score * 100)}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+              {metadata.analysis_depth && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-slate-600 dark:text-slate-400">Depth:</span>
+                  <span className="text-slate-800 dark:text-slate-200 capitalize">
+                    {metadata.analysis_depth}
+                  </span>
+                </div>
+              )}
+              {metadata.analysis_version && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-slate-600 dark:text-slate-400">Version:</span>
+                  <span className="font-mono text-slate-800 dark:text-slate-200">
+                    {metadata.analysis_version}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const formatAnalysisSection = (title: string, data: unknown, icon: React.ReactNode) => {
     if (!data) return null
 
@@ -843,6 +1086,38 @@ export function DreamDetailModal({ dream, isOpen, onClose, onChatWithDream }: Dr
           </div>
           <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3 sm:p-4 border border-slate-200 dark:border-slate-700">
             {formatCognitiveAnalysis(data)}
+          </div>
+        </div>
+      )
+    }
+
+    if (title.includes('Narrative Structure') && typeof data === 'object') {
+      return (
+        <div className="mb-4 sm:mb-6">
+          <div className="flex items-center gap-2 mb-2 sm:mb-3">
+            {icon}
+            <h3 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-100">
+              {title}
+            </h3>
+          </div>
+          <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3 sm:p-4 border border-slate-200 dark:border-slate-700">
+            {formatNarrativeStructure(data)}
+          </div>
+        </div>
+      )
+    }
+
+    if (title.includes('Processing Metadata') && typeof data === 'object') {
+      return (
+        <div className="mb-4 sm:mb-6">
+          <div className="flex items-center gap-2 mb-2 sm:mb-3">
+            {icon}
+            <h3 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-100">
+              {title}
+            </h3>
+          </div>
+          <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3 sm:p-4 border border-slate-200 dark:border-slate-700">
+            {formatProcessingMetadata(data)}
           </div>
         </div>
       )
