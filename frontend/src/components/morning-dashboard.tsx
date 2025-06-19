@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Calendar, RefreshCw, Lightbulb, Target, MessageCircle, TrendingUp, Clock, Eye, AlertTriangle } from 'lucide-react'
+import { useState, useEffect, useCallback } from 'react'
+import { Calendar, RefreshCw, Target, MessageCircle, TrendingUp, Clock, Eye, AlertTriangle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { apiClient } from '@/lib/api'
 
@@ -57,7 +57,7 @@ export function MorningDashboard({ className }: MorningDashboardProps) {
     }
   }
 
-  const loadInsights = async () => {
+  const loadInsights = useCallback(async () => {
     setLoading(true)
     setError(null)
 
@@ -86,7 +86,7 @@ export function MorningDashboard({ className }: MorningDashboardProps) {
       setError(err instanceof Error ? err.message : 'Failed to load insights')
       setLoading(false)
     }
-  }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const checkForNewerDreams = async (lastGeneratedAt: string) => {
     try {
@@ -253,7 +253,9 @@ export function MorningDashboard({ className }: MorningDashboardProps) {
                 <h2 className="text-lg font-semibold text-red-900 dark:text-red-100">
                   Shadow Analysis
                 </h2>
-                <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400" title="Unfiltered psychological insights" />
+                <div title="Unfiltered psychological insights">
+                  <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400" />
+                </div>
               </div>
               <p className="text-red-800 dark:text-red-200 leading-relaxed font-medium">
                 {insights.shadow_analysis}
