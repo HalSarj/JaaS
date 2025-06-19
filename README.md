@@ -31,6 +31,13 @@ cp .env.example .env
 # - SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY from Supabase Dashboard
 # - OPENROUTER_API_KEY or OPENAI_API_KEY from OpenRouter/OpenAI
 # - DROPBOX_APP_KEY, DROPBOX_APP_SECRET, DROPBOX_ACCESS_TOKEN from Dropbox App Console
+# - CLAUDE_MODEL defaults to anthropic/claude-haiku-4 (set another Claude model if preferred)
+```
+
+To switch models, edit `CLAUDE_MODEL` in `.env`:
+
+```bash
+CLAUDE_MODEL=anthropic/claude-sonnet-4
 ```
 
 ### 3. Deploy Edge Functions
