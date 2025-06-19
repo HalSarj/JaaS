@@ -92,24 +92,25 @@ Deno.serve(async (req) => {
         ['sign']
       );
       
-      const expectedSignature = await crypto.subtle.sign(
+      const signatureBytes = await crypto.subtle.sign(
         'HMAC',
         key,
         new TextEncoder().encode(body)
       );
-      
-      const expectedHex = Array.from(new Uint8Array(expectedSignature))
-        .map(b => b.toString(16).padStart(2, '0'))
-        .join('');
+
+      // Dropbox sends the signature as base64, so convert the bytes accordingly
+      const expectedSignature = btoa(
+        String.fromCharCode(...new Uint8Array(signatureBytes))
+      );
 
       console.log('Signature verification:', {
         received: signature,
-        expected: expectedHex,
+        expected: expectedSignature,
         bodyLength: body.length,
         secretLength: dropboxAppSecret?.length || 0
       });
 
-      if (signature !== expectedHex) {
+      if (signature !== expectedSignature) {
         console.error('Invalid signature - but proceeding for now');
         // For production, uncomment this:
         // return new Response('Invalid signature', { 

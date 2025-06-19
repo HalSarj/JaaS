@@ -162,10 +162,23 @@ if (tokenExpiresAt <= now() + 5 minutes) {
 
 ### Webhook Signature Verification
 ```typescript
-// Verify webhook authenticity
-const expectedSignature = await crypto.subtle.digest(
-  'SHA-256',
-  new TextEncoder().encode(dropboxAppSecret + body)
+// Verify webhook authenticity using HMAC-SHA256 and base64 encoding
+const key = await crypto.subtle.importKey(
+  'raw',
+  new TextEncoder().encode(dropboxAppSecret),
+  { name: 'HMAC', hash: 'SHA-256' },
+  false,
+  ['sign']
+);
+
+const signatureBytes = await crypto.subtle.sign(
+  'HMAC',
+  key,
+  new TextEncoder().encode(body)
+);
+
+const expectedSignature = btoa(
+  String.fromCharCode(...new Uint8Array(signatureBytes))
 );
 ```
 
