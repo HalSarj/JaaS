@@ -29,7 +29,7 @@ cp .env.example .env
 
 # Set your keys:
 # - SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY from Supabase Dashboard
-# - OPENROUTER_API_KEY from OpenRouter
+# - OPENROUTER_API_KEY or OPENAI_API_KEY from OpenRouter/OpenAI
 # - DROPBOX_APP_KEY, DROPBOX_APP_SECRET, DROPBOX_ACCESS_TOKEN from Dropbox App Console
 ```
 
@@ -42,6 +42,7 @@ supabase functions deploy analyze
 
 # Set environment variables in Supabase
 supabase secrets set OPENROUTER_API_KEY=your-openrouter-key
+supabase secrets set OPENAI_API_KEY=your-openai-key
 supabase secrets set DROPBOX_APP_SECRET=your-dropbox-app-secret
 supabase secrets set DROPBOX_ACCESS_TOKEN=your-dropbox-access-token
 ```
