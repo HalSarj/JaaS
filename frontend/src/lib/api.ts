@@ -133,7 +133,19 @@ export class ApiClient {
     return data || []
   }
 
-  async getDashboardInsights(forceRefresh = false): Promise<any> {
+  async getDashboardInsights(forceRefresh = false): Promise<{
+    pattern_insight: string;
+    today_practice: {
+      type: 'immediate' | 'deeper';
+      action: string;
+      duration_minutes: number;
+    };
+    integration_bridge: string;
+    reflection_prompt: string;
+    context_thread: string;
+    generated_at: string;
+    dreams_analyzed: number;
+  }> {
     if (!this.baseUrl) {
       throw new Error('Supabase URL not configured')
     }
