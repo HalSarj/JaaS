@@ -147,7 +147,7 @@ export function MorningDashboard({ className }: MorningDashboardProps) {
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
                 <h2 className="text-lg font-semibold text-green-900 dark:text-green-100">
-                  Today's Practice
+                  Today&apos;s Practice
                 </h2>
                 <span className="flex items-center gap-1 px-2 py-1 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-full text-xs">
                   <Clock className="w-3 h-3" />
