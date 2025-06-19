@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Calendar, RefreshCw, Lightbulb, Target, MessageCircle, TrendingUp, Clock } from 'lucide-react'
+import { Calendar, RefreshCw, Lightbulb, Target, MessageCircle, TrendingUp, Clock, Eye, AlertTriangle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { apiClient } from '@/lib/api'
 
@@ -13,7 +13,7 @@ interface DashboardInsights {
     duration_minutes: number
   }
   integration_bridge: string
-  reflection_prompt: string
+  shadow_analysis: string
   context_thread: string
   generated_at: string
   dreams_analyzed: number
@@ -242,19 +242,25 @@ export function MorningDashboard({ className }: MorningDashboardProps) {
           </div>
         </div>
 
-        {/* Reflection Prompt */}
-        <div className="lg:col-span-2 bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 rounded-xl p-6 border border-amber-200 dark:border-amber-800">
+        {/* Shadow Analysis */}
+        <div className="lg:col-span-2 bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 rounded-xl p-6 border border-red-200 dark:border-red-800">
           <div className="flex items-start gap-3">
-            <div className="flex-shrink-0 w-10 h-10 bg-amber-100 dark:bg-amber-900 rounded-full flex items-center justify-center">
-              <Lightbulb className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+            <div className="flex-shrink-0 w-10 h-10 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center">
+              <Eye className="w-5 h-5 text-red-600 dark:text-red-400" />
             </div>
             <div className="flex-1">
-              <h2 className="text-lg font-semibold text-amber-900 dark:text-amber-100 mb-2">
-                Reflection Prompt
-              </h2>
-              <p className="text-amber-800 dark:text-amber-200 leading-relaxed">
-                {insights.reflection_prompt}
+              <div className="flex items-center gap-2 mb-2">
+                <h2 className="text-lg font-semibold text-red-900 dark:text-red-100">
+                  Shadow Analysis
+                </h2>
+                <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400" title="Unfiltered psychological insights" />
+              </div>
+              <p className="text-red-800 dark:text-red-200 leading-relaxed font-medium">
+                {insights.shadow_analysis}
               </p>
+              <div className="mt-3 text-xs text-red-700 dark:text-red-300 italic border-t border-red-200 dark:border-red-800 pt-2">
+                Raw shadow work - your unconscious revealing what you might not want to hear.
+              </div>
             </div>
           </div>
         </div>
