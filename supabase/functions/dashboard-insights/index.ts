@@ -172,24 +172,62 @@ async function generateDashboardInsights(dreams: any[]): Promise<DashboardInsigh
         }
       ],
       temperature: 0.7,
-      max_tokens: 1000
+      max_tokens: 1500
     })
   });
 
   if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`OpenRouter API error: ${error}`);
+    let errorMessage = `OpenRouter API error: ${response.status} ${response.statusText}`;
+    try {
+      const errorData = await response.json();
+      errorMessage += ` - ${errorData.error?.message || JSON.stringify(errorData)}`;
+    } catch (e) {
+      const errorText = await response.text().catch(() => 'Unable to read error response');
+      errorMessage += ` - ${errorText}`;
+    }
+    throw new Error(errorMessage);
   }
 
-  const result = await response.json();
-  const content = result.choices[0]?.message?.content;
+  let result;
+  try {
+    result = await response.json();
+  } catch (e) {
+    throw new Error('Failed to parse OpenRouter API response as JSON');
+  }
+
+  if (!result.choices || !result.choices[0] || !result.choices[0].message) {
+    throw new Error('Invalid OpenRouter API response structure');
+  }
+
+  const content = result.choices[0].message.content;
   
   if (!content) {
     throw new Error('No content returned from AI');
   }
 
   try {
-    const insights = JSON.parse(content);
+    // Extract JSON from potentially wrapped text (e.g., markdown code blocks)
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      console.error('No JSON found in AI response:', content);
+      throw new Error('Invalid response format from AI - no JSON detected');
+    }
+
+    const jsonString = jsonMatch[0];
+    const insights = JSON.parse(jsonString);
+    
+    // Validate required fields
+    const requiredFields = ['pattern_insight', 'today_practice', 'integration_bridge', 'shadow_analysis', 'context_thread'];
+    const missingFields = requiredFields.filter(field => !insights[field]);
+    
+    if (missingFields.length > 0) {
+      throw new Error(`Missing required fields in AI response: ${missingFields.join(', ')}`);
+    }
+
+    // Validate today_practice structure
+    if (!insights.today_practice?.action || !insights.today_practice?.type || typeof insights.today_practice?.duration_minutes !== 'number') {
+      throw new Error('Invalid today_practice structure in AI response');
+    }
     
     // Add metadata
     insights.generated_at = new Date().toISOString();
@@ -198,7 +236,8 @@ async function generateDashboardInsights(dreams: any[]): Promise<DashboardInsigh
     return insights;
   } catch (e) {
     console.error('Failed to parse AI response:', content);
-    throw new Error('Invalid response format from AI');
+    console.error('Parse error:', e);
+    throw new Error(`Invalid response format from AI: ${e instanceof Error ? e.message : 'Unknown parsing error'}`);
   }
 }
 
@@ -220,7 +259,7 @@ function buildInsightsPrompt(dreams: any[]): string {
 RECENT DREAMS:
 ${dreamSummaries}
 
-Create insights in this exact JSON format:
+CRITICAL: You must respond with ONLY valid JSON in the exact format below. Do not include any text before or after the JSON. Do not use markdown code blocks.
 
 {
   "pattern_insight": "A 2-3 sentence interpretation of the key pattern or relationship between these dreams. What's the underlying psychological theme or message?",
@@ -230,16 +269,20 @@ Create insights in this exact JSON format:
     "duration_minutes": 5
   },
   "integration_bridge": "How to apply the dream wisdom to daily interactions and decisions today. Be specific about real-life application.",
-  "shadow_analysis": "Uncompromising analysis of negative traits, repressed aspects, or shadow elements revealed in these dreams. Be direct and honest about what the unconscious is showing about character flaws, blind spots, or avoided truths.",
+  "shadow_analysis": "Direct, unflinching analysis of shadow elements, blind spots, and unconscious patterns revealed in the dreams. Focus on what the psyche is trying to show about hidden aspects of personality, defense mechanisms, or avoided truths. Be honest and clear without being needlessly harsh - the goal is insight, not judgment.",
   "context_thread": "A brief note on how these recent patterns might relate to longer-term psychological development or growth themes."
 }
 
-Guidelines:
+IMPORTANT REQUIREMENTS:
+- All text fields must be non-empty strings
+- duration_minutes must be a number between 5 and 30
+- type must be either "immediate" or "deeper"
+- Response must be valid JSON only - no additional text
 - Keep all text conversational and accessible, not overly clinical
 - Make the "today_practice" genuinely doable and specific
 - Choose "immediate" (5-10 mins) for most practices, only use "deeper" (20-30 mins) and increase duration_minutes if the patterns suggest significant integration work is needed
 - Focus on Jungian principles applied practically
 - Be encouraging but realistic in most sections
-- For "shadow_analysis": Be brutally honest and direct - no sugar-coating or gentle language. Call out psychological patterns, defense mechanisms, and negative traits clearly
-- No generic advice - make it specific to these dream patterns`);
+- For "shadow_analysis": Provide direct, unflinching insight into hidden aspects, defense mechanisms, and blind spots. Be honest without being needlessly harsh; the aim is understanding, not judgment
+- No generic advice - make it specific to these dream patterns`;
 }
