@@ -230,7 +230,7 @@ Create insights in this exact JSON format:
     "duration_minutes": 5
   },
   "integration_bridge": "How to apply the dream wisdom to daily interactions and decisions today. Be specific about real-life application.",
-  "shadow_analysis": "Uncompromising analysis of negative traits, repressed aspects, or shadow elements revealed in these dreams. Be direct and honest about what the unconscious is showing about character flaws, blind spots, or avoided truths.",
+  "shadow_analysis": "Direct, unflinching analysis of shadow elements, blind spots, and unconscious patterns revealed in the dreams. Focus on what the psyche is trying to show about hidden aspects of personality, defense mechanisms, or avoided truths. Be honest and clear without being needlessly harsh - the goal is insight, not judgment.",
   "context_thread": "A brief note on how these recent patterns might relate to longer-term psychological development or growth themes."
 }
 
@@ -240,6 +240,6 @@ Guidelines:
 - Choose "immediate" (5-10 mins) for most practices, only use "deeper" (20-30 mins) and increase duration_minutes if the patterns suggest significant integration work is needed
 - Focus on Jungian principles applied practically
 - Be encouraging but realistic in most sections
-- For "shadow_analysis": Be brutally honest and direct - no sugar-coating or gentle language. Call out psychological patterns, defense mechanisms, and negative traits clearly
+ - For "shadow_analysis": Provide direct, unflinching insight into hidden aspects, defense mechanisms, and blind spots. Be honest without being needlessly harsh; the aim is understanding, not judgment
 - No generic advice - make it specific to these dream patterns`);
 }
