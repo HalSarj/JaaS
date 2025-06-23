@@ -239,7 +239,7 @@ serve(async (req) => {
 
     // Step 3: Analyze with Claude Sonnet 4
     try {
-      const modelName = 'anthropic/claude-sonnet-4';
+      const modelName = 'openai/gpt-4o';
       const analysisPrompt = buildAnalysisPrompt(transcript, recentDreams || [], recurringMotifs || [], modelName);
       
       const analysisResponse = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
