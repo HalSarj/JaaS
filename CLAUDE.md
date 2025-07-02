@@ -12,7 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Backend**: Supabase (PostgreSQL + Edge Functions) with vector embeddings for dream similarity search  
 **Frontend**: Next.js 15 with TypeScript, Tailwind CSS 4, and Radix UI components  
-**AI Integration**: GPT-4o for analysis, Whisper for transcription (via OpenRouter)  
+**AI Integration**: GPT-o3 for analysis, Whisper for transcription (via OpenRouter)  
 **External Integration**: Dropbox OAuth2 for automated file monitoring
 
 ## Essential Commands
@@ -87,7 +87,7 @@ SUPABASE_ANON_KEY=your-anon-key
 
 # AI Services
 OPENROUTER_API_KEY=your-openrouter-key
-CLAUDE_MODEL=openai/gpt-4o
+CLAUDE_MODEL=openai/o3
 
 # Dropbox OAuth2
 DROPBOX_APP_KEY=your-app-key
