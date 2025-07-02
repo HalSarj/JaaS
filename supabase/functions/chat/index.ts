@@ -170,7 +170,7 @@ When no dreams are available, guide users toward meaningful dream recall and ana
 
     console.log('Sending request to LLM...');
 
-    // 6. Generate response using Claude
+    // 6. Generate response using GPT o3
     const chatResponse = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
       method: 'POST',
       headers: {
@@ -178,7 +178,7 @@ When no dreams are available, guide users toward meaningful dream recall and ana
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'openai/gpt-4o',
+        model: 'openai/gpt-o3',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
