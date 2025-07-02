@@ -60,9 +60,9 @@ CREATE POLICY "Service role can manage all tokens" ON dropbox_tokens
 CREATE OR REPLACE FUNCTION cleanup_expired_oauth_states()
 RETURNS void AS $$
 BEGIN
-  DELETE FROM oauth_states WHERE expires_at < now();
+  DELETE FROM public.oauth_states WHERE expires_at < now();
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
 
 -- Function to check if a user's token is valid/expired
 CREATE OR REPLACE FUNCTION is_dropbox_token_valid(p_user_id uuid)
@@ -71,7 +71,7 @@ DECLARE
   token_expires_at timestamptz;
 BEGIN
   SELECT expires_at INTO token_expires_at
-  FROM dropbox_tokens
+  FROM public.dropbox_tokens
   WHERE user_id = p_user_id;
   
   -- If no token found, return false
@@ -87,4 +87,4 @@ BEGIN
   -- Check if token is still valid (with 5-minute buffer)
   RETURN token_expires_at > (now() + interval '5 minutes');
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER; 
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = ''; 
