@@ -237,9 +237,9 @@ serve(async (req) => {
     const recentDreams = selectRelevantDreams(transcript, allDreams || []);
     const recurringMotifs = filterActiveMotifs(allMotifs || []);
 
-    // Step 3: Analyze with Claude Sonnet 4
+    // Step 3: Analyze with GPT o3
     try {
-      const modelName = 'openai/gpt-4o';
+      const modelName = 'openai/gpt-o3';
       const analysisPrompt = buildAnalysisPrompt(transcript, recentDreams || [], recurringMotifs || [], modelName);
       
       const analysisResponse = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {

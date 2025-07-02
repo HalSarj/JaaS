@@ -87,7 +87,7 @@ SUPABASE_ANON_KEY=your-anon-key
 
 # AI Services
 OPENROUTER_API_KEY=your-openrouter-key
-CLAUDE_MODEL=openai/gpt-4o
+CLAUDE_MODEL=openai/gpt-o3
 
 # Dropbox OAuth2
 DROPBOX_APP_KEY=your-app-key
