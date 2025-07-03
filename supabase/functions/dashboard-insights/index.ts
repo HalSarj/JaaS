@@ -164,7 +164,7 @@ async function generateDashboardInsights(dreams: any[]): Promise<DashboardInsigh
       messages: [
         {
           role: 'system',
-          content: 'You are an expert Jungian dream analyst. Create practical daily guidance based on recent dream patterns. Respond only with valid JSON in the exact format requested.'
+          content: 'You are a practical Jungian analyst creating morning guidance for psychological integration. Identify what the unconscious has been communicating through recent dreams, then provide specific daily practices for engaging with this material. Be direct and insightful about deeper patterns, especially shadow elements. Respond only with valid JSON in the exact format requested.'
         },
         {
           role: 'user',

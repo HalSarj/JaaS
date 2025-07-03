@@ -253,7 +253,7 @@ serve(async (req) => {
           messages: [
             {
               role: 'system',
-              content: 'You are an expert dream analyst combining Jungian psychology and cognitive neuroscience. Provide comprehensive dream analysis in the exact JSON format requested.'
+              content: 'You are a depth-oriented dream analyst specializing in Jungian self-discovery. Your role is to uncover what the unconscious is actively trying to reveal, then translate these insights into practical steps for psychological growth. Focus on shadow work, individuation themes, and archetypal patterns. Provide comprehensive analysis in the exact JSON format requested.'
             },
             {
               role: 'user',
