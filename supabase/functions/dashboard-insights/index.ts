@@ -160,7 +160,7 @@ async function generateDashboardInsights(dreams: any[]): Promise<DashboardInsigh
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'openai/o3',
+      model: 'openai/o3-mini',
       messages: [
         {
           role: 'system',
