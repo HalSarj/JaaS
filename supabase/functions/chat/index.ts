@@ -178,7 +178,7 @@ When no dreams are available, guide users toward meaningful dream recall and ana
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'openai/o3',
+        model: 'openai/o3-mini',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
