@@ -237,55 +237,34 @@ serve(async (req) => {
     const recentDreams = selectRelevantDreams(transcript, allDreams || []);
     const recurringMotifs = filterActiveMotifs(allMotifs || []);
 
-    // Step 3: Analyze with Claude Sonnet 4
+    // Step 3: Analyze with Claude Sonnet 4 (with automatic retry for JSON parsing failures)
+    let analysis;
     try {
-      const modelName = 'openai/o3-mini';
-      const analysisPrompt = buildAnalysisPrompt(transcript, recentDreams || [], recurringMotifs || [], modelName);
+      analysis = await performAnalysisWithRetry(OPENROUTER_API_KEY, transcript, recentDreams || [], recurringMotifs || []);
+    } catch (analysisError) {
+      console.error('Analysis error after retries:', analysisError);
       
-      const analysisResponse = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: modelName,
-          messages: [
-            {
-              role: 'system',
-              content: 'You are a depth-oriented dream analyst specializing in Jungian self-discovery. Your role is to uncover what the unconscious is actively trying to reveal, then translate these insights into practical steps for psychological growth. Focus on shadow work, individuation themes, and archetypal patterns. Provide comprehensive analysis in the exact JSON format requested.'
-            },
-            {
-              role: 'user',
-              content: analysisPrompt
-            }
-          ],
-          temperature: 0.3,
-          max_tokens: 4000
+      await supabase
+        .from('dreams')
+        .update({ 
+          status: 'failed',
+          error_message: `Analysis failed: ${analysisError.message}`
         })
-      });
+        .eq('id', dream_id);
 
-      if (!analysisResponse.ok) {
-        const errorText = await analysisResponse.text();
-        throw new Error(`Analysis failed: ${errorText}`);
-      }
+      return new Response(
+        JSON.stringify({ 
+          error: 'Analysis failed',
+          details: analysisError.message 
+        }),
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
 
-      const analysisResult = await analysisResponse.json();
-      const analysisText = analysisResult.choices[0].message.content;
-      
-      // Parse the JSON analysis
-      let analysis;
-      try {
-        // Extract JSON from the response (in case it's wrapped in markdown)
-        const jsonMatch = analysisText.match(/```json\n([\s\S]*?)\n```/) || 
-                         analysisText.match(/\{[\s\S]*\}/);
-        const jsonStr = jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : analysisText;
-        analysis = JSON.parse(jsonStr);
-      } catch (parseError) {
-        console.error('Failed to parse analysis JSON:', parseError);
-        console.error('Raw analysis text:', analysisText);
-        throw new Error('Failed to parse analysis result');
-      }
+    try {
 
       // Generate embedding for the transcript using OpenAI API
       const embeddingResponse = await fetch('https://api.openai.com/v1/embeddings', {
@@ -335,21 +314,21 @@ serve(async (req) => {
         }
       );
 
-    } catch (analysisError) {
-      console.error('Analysis error:', analysisError);
+    } catch (error) {
+      console.error('Error in embedding or database operations:', error);
       
       await supabase
         .from('dreams')
         .update({ 
           status: 'failed',
-          error_message: `Analysis failed: ${analysisError.message}`
+          error_message: `Post-analysis error: ${error.message}`
         })
         .eq('id', dream_id);
 
       return new Response(
         JSON.stringify({ 
-          error: 'Analysis failed',
-          details: analysisError.message 
+          error: 'Post-analysis processing failed',
+          details: error.message 
         }),
         { 
           status: 500, 
@@ -372,6 +351,91 @@ serve(async (req) => {
     );
   }
 });
+
+async function performAnalysisWithRetry(
+  apiKey: string, 
+  transcript: string, 
+  recentDreams: any[], 
+  recurringMotifs: any[], 
+  maxRetries: number = 1
+): Promise<any> {
+  const modelName = 'openai/o3-mini';
+  const analysisPrompt = buildAnalysisPrompt(transcript, recentDreams, recurringMotifs, modelName);
+  
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(`Analysis attempt ${attempt + 1}/${maxRetries + 1}`);
+      
+      const analysisResponse = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: modelName,
+          messages: [
+            {
+              role: 'system',
+              content: 'You are a depth-oriented dream analyst specializing in Jungian self-discovery. Your role is to uncover what the unconscious is actively trying to reveal, then translate these insights into practical steps for psychological growth. Focus on shadow work, individuation themes, and archetypal patterns. Provide comprehensive analysis in the exact JSON format requested.'
+            },
+            {
+              role: 'user',
+              content: analysisPrompt
+            }
+          ],
+          temperature: 0.3,
+          max_tokens: 4000
+        })
+      });
+
+      if (!analysisResponse.ok) {
+        const errorText = await analysisResponse.text();
+        throw new Error(`API request failed: ${errorText}`);
+      }
+
+      const analysisResult = await analysisResponse.json();
+      const analysisText = analysisResult.choices[0].message.content;
+      
+      // Parse the JSON analysis
+      try {
+        // Extract JSON from the response (in case it's wrapped in markdown)
+        const jsonMatch = analysisText.match(/```json\n([\s\S]*?)\n```/) || 
+                         analysisText.match(/\{[\s\S]*\}/);
+        const jsonStr = jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : analysisText;
+        const analysis = JSON.parse(jsonStr);
+        
+        console.log(`Analysis successful on attempt ${attempt + 1}`);
+        return analysis;
+        
+      } catch (parseError) {
+        console.error(`JSON parsing failed on attempt ${attempt + 1}:`, parseError);
+        console.error('Raw analysis text:', analysisText);
+        
+        // If this is our last attempt, throw the error
+        if (attempt === maxRetries) {
+          throw new Error(`Failed to parse analysis result after ${maxRetries + 1} attempts. Last error: ${parseError.message}`);
+        }
+        
+        // Otherwise, continue to next attempt
+        console.log(`Retrying analysis (attempt ${attempt + 2}/${maxRetries + 1})...`);
+      }
+      
+    } catch (error) {
+      // If it's not a JSON parsing error, don't retry
+      if (!error.message.includes('parse') && !error.message.includes('JSON')) {
+        throw error;
+      }
+      
+      // If this is our last attempt, throw the error
+      if (attempt === maxRetries) {
+        throw error;
+      }
+      
+      console.log(`Non-parsing error on attempt ${attempt + 1}, retrying...`);
+    }
+  }
+}
 
 function selectRelevantDreams(transcript: string, allDreams: any[]): any[] {
   if (!allDreams || allDreams.length === 0) return [];
