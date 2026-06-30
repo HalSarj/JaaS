@@ -39,3 +39,5 @@ build/
 # Temporary files
 *.tmp
 *.temp
+# Cursor editor local config (may contain access tokens)
+.cursor/mcp.json
